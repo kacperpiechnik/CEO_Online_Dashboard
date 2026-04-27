@@ -236,7 +236,12 @@ function getRange(f){
 
 function aggKpi(rows, range){
   if(range.projected) return {};
-  const weeks = (rows||[]).filter(w=>{ const ws=new Date(w.week_start); const we=addDays(ws,6); return we>=range.start && ws<=range.end; });
+  let weeks = (rows||[]).filter(w=>{ const ws=new Date(w.week_start); const we=addDays(ws,6); return we>=range.start && ws<=range.end; });
+  // FIX: if no week matches (e.g. very start of new week before snapshot runs), fall back to the most recent week
+  if(weeks.length === 0 && rows && rows.length > 0){
+    const mostRecent = rows[rows.length-1]; // rows arrive sorted asc, so last is most recent
+    if(mostRecent) weeks = [mostRecent];
+  }
   const sum = k => weeks.reduce((s,w)=>s+(Number(w[k])||0),0);
   const avg = k => { const v=weeks.map(w=>Number(w[k])).filter(x=>!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:null; };
   const last = k => { for(let i=weeks.length-1;i>=0;i--){ const v=weeks[i][k]; if(v!=null) return Number(v); } return null; };
@@ -354,8 +359,11 @@ function renderAll(){
 function renderOverview(range){
   const a = aggKpi(state.data.kpi, range);
   const dt = state.data.dt || [];
-  const ucActive = dt.filter(d=>d.is_active && !d.deleted_from_source && d.acquisition_status && !['Terminated','Closed','Sold'].includes(d.acquisition_status)).length;
-  const pipelineValue = dt.filter(d=>d.is_active && !d.deleted_from_source).reduce((s,d)=>s+(+d.purchase_price||0),0);
+  // FIX: shared filter — active AND not closed/sold/terminated. Used by both count and value.
+  const trulyActive = dt.filter(d => d.is_active && !d.deleted_from_source &&
+    !['Terminated','Closed','Sold'].includes(d.acquisition_status||''));
+  const ucActive = trulyActive.length;
+  const pipelineValue = trulyActive.reduce((s,d)=>s+(+d.purchase_price||0),0);
 
   document.getElementById('ov-activity').innerHTML = [
     card('Active UC Deals', fmtN(ucActive), 'currently in deal_tracker'),
@@ -467,13 +475,17 @@ function renderLeads(range){
 
 function renderPipeline(range){
   const dt = state.data.dt || [];
-  const active = dt.filter(d=>d.is_active && !d.deleted_from_source);
-  const inUC = active.filter(d=>!['Closed','Sold','Terminated'].includes(d.acquisition_status||''));
+  // FIX: 'active' now means truly active — not closed/sold/terminated regardless of is_active flag
+  const active = dt.filter(d => d.is_active && !d.deleted_from_source &&
+    !['Terminated','Closed','Sold'].includes(d.acquisition_status||''));
+  const inUC = active; // same set now
   const totalProj = active.reduce((s,d)=>s+(+d.projected_profit_override||+d.projected_profit||0),0);
   const totalCost = active.reduce((s,d)=>s+(+d.purchase_price||0),0);
-  const within30 = active.filter(d=>d.end_buyer_close_date && new Date(d.end_buyer_close_date)<=addDays(new Date(),30));
-  const within60 = active.filter(d=>d.end_buyer_close_date && new Date(d.end_buyer_close_date)<=addDays(new Date(),60));
-  const within90 = active.filter(d=>d.end_buyer_close_date && new Date(d.end_buyer_close_date)<=addDays(new Date(),90));
+  // FIX: future-only — close date must be today or later
+  const today = new Date(); today.setHours(0,0,0,0);
+  const within30 = active.filter(d=>d.end_buyer_close_date && new Date(d.end_buyer_close_date)>=today && new Date(d.end_buyer_close_date)<=addDays(today,30));
+  const within60 = active.filter(d=>d.end_buyer_close_date && new Date(d.end_buyer_close_date)>=today && new Date(d.end_buyer_close_date)<=addDays(today,60));
+  const within90 = active.filter(d=>d.end_buyer_close_date && new Date(d.end_buyer_close_date)>=today && new Date(d.end_buyer_close_date)<=addDays(today,90));
   const sumProj = arr => arr.reduce((s,d)=>s+(+d.projected_profit_override||+d.projected_profit||0),0);
 
   document.getElementById('pl-cards').innerHTML = [
