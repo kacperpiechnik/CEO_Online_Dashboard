@@ -15,21 +15,31 @@
   .filter-btn{transition:all .15s}
   .filter-btn.active{background:#111827!important;color:white!important}
   .kpi-card{background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px}
+  .kpi-card.accent{background:linear-gradient(135deg,#fafbff 0%,#f4f5fb 100%);border-color:#dde1f0}
   .kpi-label{font-size:10.5px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
   .kpi-value{font-size:24px;font-weight:700;color:#111827;margin-top:4px;line-height:1.1}
   .kpi-sub{font-size:11px;color:#6b7280;margin-top:4px}
+  .kpi-good{color:#059669}
+  .kpi-bad{color:#dc2626}
   .pill{display:inline-flex;align-items:center;padding:1px 7px;border-radius:9px;font-size:10.5px;font-weight:600;margin-left:6px}
   .pill-g{background:#dcfce7;color:#166534}
   .pill-y{background:#fef3c7;color:#854408}
   .pill-r{background:#fee2e2;color:#991818}
   .pill-x{background:#f3f4f6;color:#374151}
+  .pill-strategy{display:inline-block;padding:1px 8px;border-radius:9px;font-size:10px;font-weight:600;background:#eef2ff;color:#3730a3}
+  .pill-strategy.dc{background:#fef3c7;color:#854408}
+  .pill-strategy.as{background:#dcfce7;color:#166534}
+  .pill-strategy.sd{background:#f3e8ff;color:#6b21a8}
   .sec-h{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin:0 0 10px 0}
   .card{background:white;border:1px solid #e5e7eb;border-radius:10px;padding:18px}
   .card-t{font-size:14px;font-weight:600;color:#111827;margin-bottom:14px}
+  .card-t-sub{font-size:11px;font-weight:500;color:#6b7280;margin-left:6px}
   table.dt{width:100%;border-collapse:collapse}
   table.dt th{text-align:left;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;padding:9px 11px;border-bottom:1px solid #e5e7eb}
   table.dt td{font-size:13px;color:#111827;padding:9px 11px;border-bottom:1px solid #f3f4f6}
   table.dt tr:hover{background:#f9fafb}
+  table.dt td.num{text-align:right;font-variant-numeric:tabular-nums}
+  table.dt th.num{text-align:right}
   .spinner{display:inline-block;width:14px;height:14px;border:2px solid #e5e7eb;border-top-color:#111827;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
   @keyframes spin{to{transform:rotate(360deg)}}
   [hidden]{display:none!important}
@@ -110,14 +120,30 @@
 
   <!-- PIPELINE -->
   <section data-section="pipeline" hidden>
-    <h2 class="sec-h">Active Pipeline</h2>
+    <h2 class="sec-h">Active Pipeline <span class="text-gray-400 normal-case font-normal tracking-normal">— from <code class="bg-gray-100 px-1 rounded">v_sales_pipeline_summary</code></span></h2>
     <div id="pl-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-    <h2 class="sec-h mt-7">Projected Profit</h2>
+
+    <h2 class="sec-h mt-7">Capital & Risk</h2>
+    <div id="pl-capital" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+
+    <h2 class="sec-h mt-7">Profit Outlook</h2>
+    <div id="pl-profit" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+
+    <h2 class="sec-h mt-7">Closing Timeline (from end_buyer_close_date)</h2>
     <div id="pj-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+
+    <h2 class="sec-h mt-7">Strategy Mix</h2>
+    <div id="strategy-mix" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+
+    <h2 class="sec-h mt-7">Subdivide Tracker</h2>
+    <div id="subdivide-card"></div>
+
     <h2 class="sec-h mt-7">Under Contract — Pipeline Health</h2>
     <div class="card"><div id="uc-stages" class="overflow-x-auto"></div></div>
-    <h2 class="sec-h mt-7">Active Deals</h2>
+
+    <h2 class="sec-h mt-7">Active Deals <span class="text-gray-400 normal-case font-normal tracking-normal">— from <code class="bg-gray-100 px-1 rounded">v_sales_pipeline</code></span></h2>
     <div class="card"><div id="active-deals" class="overflow-x-auto"></div></div>
+
     <h2 class="sec-h mt-7">Stale Deals — Needs Attention</h2>
     <div class="card"><div id="stale-deals" class="overflow-x-auto"></div></div>
   </section>
@@ -126,12 +152,18 @@
   <section data-section="team" hidden>
     <h2 class="sec-h">Acquisition Manager — Jonathan</h2>
     <div id="am-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+
     <h2 class="sec-h mt-7">Disposition Manager — Jared</h2>
     <div id="dispo-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+
     <h2 class="sec-h mt-7">Lead Manager — Manny</h2>
-    <div id="lm-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+    <div class="text-xs text-gray-500 -mt-2 mb-2">Activity from JustCall · Outcomes from Pipedrive stage history</div>
+    <div id="lm-activity" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+    <div id="lm-outcomes" class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3"></div>
+
     <h2 class="sec-h mt-7">SMS — Tamar</h2>
     <div id="sms-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+
     <h2 class="sec-h mt-7">Cold Caller Team (Last 4 Weeks)</h2>
     <div class="card"><div id="cc-table" class="overflow-x-auto"></div></div>
   </section>
@@ -188,15 +220,18 @@ async function loadAll(){
   btn.disabled = true; lbl.innerHTML = '<span class="spinner"></span>Loading';
   document.getElementById('error-banner').hidden = true;
   try {
-    const [kpi,snap,am,quo,lm,sms,cc,dt,costs,cf,th,al,ph,stale,ccp] = await Promise.all([
+    const [kpi,snap,am,quo,lm,lmOut,sms,cc,dt,vsp,vsps,costs,cf,th,al,ph,stale,ccp] = await Promise.all([
       sb('kpi_weekly_snapshot?order=week_start.asc'),
       sb('pipedrive_daily_snapshot?order=snapshot_date.desc&limit=30'),
       sb('v_am_weekly_scorecard?order=week_start.desc&limit=16'),
       sb('v_quo_weekly?order=week_start.desc&limit=32'),
       sb('v_lead_manager_weekly?order=week_start.desc&limit=16'),
+      sb('v_lead_manager_outcomes_weekly?order=week_start.desc&limit=32'),
       sb('v_sms_weekly?order=week_start.desc&limit=16'),
       sb('cold_caller_weekly?order=week_start.desc&limit=80'),
       sb('deal_tracker?order=contract_date.desc.nullslast'),
+      sb('v_sales_pipeline?order=contract_date.desc.nullslast'),
+      sb('v_sales_pipeline_summary'),
       sb('v_true_monthly_costs?order=month.desc&limit=12'),
       sb('v_2026_channel_funnel'),
       sb('kpi_thresholds'),
@@ -205,7 +240,7 @@ async function loadAll(){
       sb('v_stale_deals?limit=25'),
       sb('v_cold_caller_performance')
     ]);
-    state.data = { kpi, snap, am, quo, lm, sms, cc, dt, costs, channelFunnel:cf, thresholds:th, listings:al, pipelineHealth:ph, stale, ccPerf:ccp };
+    state.data = { kpi, snap, am, quo, lm, lmOut, sms, cc, dt, vsp, vsps:(vsps[0]||{}), costs, channelFunnel:cf, thresholds:th, listings:al, pipelineHealth:ph, stale, ccPerf:ccp };
     state.lastRefresh = new Date();
     document.getElementById('last-refresh').textContent = `Updated ${state.lastRefresh.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
     renderAll();
@@ -237,9 +272,8 @@ function getRange(f){
 function aggKpi(rows, range){
   if(range.projected) return {};
   let weeks = (rows||[]).filter(w=>{ const ws=new Date(w.week_start); const we=addDays(ws,6); return we>=range.start && ws<=range.end; });
-  // FIX: if no week matches (e.g. very start of new week before snapshot runs), fall back to the most recent week
   if(weeks.length === 0 && rows && rows.length > 0){
-    const mostRecent = rows[rows.length-1]; // rows arrive sorted asc, so last is most recent
+    const mostRecent = rows[rows.length-1];
     if(mostRecent) weeks = [mostRecent];
   }
   const sum = k => weeks.reduce((s,w)=>s+(Number(w[k])||0),0);
@@ -307,6 +341,7 @@ const fmt1 = n => (n==null||isNaN(+n))?'—':Number(n).toLocaleString('en-US',{m
 const fmt$ = n => { if(n==null||isNaN(+n))return'—'; const v=+n; if(Math.abs(v)>=1e6)return'$'+(v/1e6).toFixed(2)+'M'; if(Math.abs(v)>=1e4)return'$'+Math.round(v/1e3)+'k'; return '$'+Math.round(v).toLocaleString('en-US'); };
 const fmt$0 = n => (n==null||isNaN(+n))?'—':'$'+Math.round(Number(n)).toLocaleString('en-US');
 const fmtPct = n => (n==null||isNaN(+n))?'—':Number(n).toFixed(1)+'%';
+const fmtPctRaw = n => (n==null||isNaN(+n))?'—':Number(n).toFixed(0)+'%'; // for ROI/IRR coming as decimals or already %
 const fmtX = n => (n==null||isNaN(+n))?'—':Number(n).toFixed(1)+'x';
 const fmtD = d => !d?'—':((typeof d==='string')?new Date(d):d).toLocaleDateString('en-US',{month:'short',day:'numeric'});
 
@@ -322,9 +357,18 @@ function pill(kpiName, value){
   return '';
 }
 
+// Strategy pill class
+function strategyClass(s){
+  if(!s) return 'pill-strategy';
+  if(s.includes('Double')) return 'pill-strategy dc';
+  if(s.includes('Assignment')) return 'pill-strategy as';
+  if(s.includes('Subdivide')) return 'pill-strategy sd';
+  return 'pill-strategy';
+}
+
 // ---------- KPI card ----------
-function card(label, value, sub='', threshKpi=''){
-  return `<div class="kpi-card">
+function card(label, value, sub='', threshKpi='', accent=false){
+  return `<div class="kpi-card${accent?' accent':''}">
     <div class="kpi-label">${label}${threshKpi ? pill(threshKpi, value) : ''}</div>
     <div class="kpi-value">${value}</div>
     ${sub ? `<div class="kpi-sub">${sub}</div>` : ''}
@@ -358,16 +402,11 @@ function renderAll(){
 
 function renderOverview(range){
   const a = aggKpi(state.data.kpi, range);
-  const dt = state.data.dt || [];
-  // FIX: shared filter — active AND not closed/sold/terminated. Used by both count and value.
-  const trulyActive = dt.filter(d => d.is_active && !d.deleted_from_source &&
-    !['Terminated','Closed','Sold'].includes(d.acquisition_status||''));
-  const ucActive = trulyActive.length;
-  const pipelineValue = trulyActive.reduce((s,d)=>s+(+d.purchase_price||0),0);
+  const s = state.data.vsps || {};
 
   document.getElementById('ov-activity').innerHTML = [
-    card('Active UC Deals', fmtN(ucActive), 'currently in deal_tracker'),
-    card('Pipeline Value', fmt$(pipelineValue), 'sum of purchase prices'),
+    card('Active UC Deals', fmtN(s.active_deals), 'currently in pipeline'),
+    card('Pipeline Cost Basis', fmt$(s.total_purchase_price), 'sum of purchase prices'),
     card('New Leads', fmtN(a.gross_leads_all), `${a.weeks_count||0} weeks`),
     card('Deals UC (period)', fmtN(a.deals_under_contract), `${fmtN(a.canceled_contracts)} terminated`, 'deals_under_contract'),
     card('Qualified Leads', fmtN(a.qualified_leads_all), '', 'qualified_leads_all'),
@@ -388,14 +427,14 @@ function renderOverview(range){
   ].join('');
 
   document.getElementById('ov-financials').innerHTML = [
-    card('Projected Profit (60d)', fmt$(a.projected_profit_close_60d), 'closing this window', 'projected_profit_month'),
+    card('Quick Profit (Pipeline)', fmt$(s.total_quick_profit_estimate), 'rough early estimate', '', true),
+    card('Projected Profit', fmt$(s.total_projected_profit), 'listing-based', '', true),
+    card('Estimated PA Net', fmt$(s.total_estimated_pa_net), 'after splits & costs', '', true),
+    card('Avg Deal ROI', fmtPctRaw(s.avg_roi_pct), 'on PA capital'),
+    card('Avg Deal IRR', fmtPctRaw(s.avg_irr_pct), 'annualized'),
     card('Inventory (cost basis)', fmt$(a.cost_basis_inventory), `${fmtN(a.apns_in_inventory)} APNs`),
-    card('Book Value (listings)', fmt$(a.book_value_inventory), 'sum of list prices'),
-    card('Pipeline Profit', fmt$(a.gross_profit_pipeline), 'projected from inv'),
     card('Closed Revenue', fmt$(a.property_sales), `${fmtN(a.apns_sold)} sold`),
-    card('Gross Profit', fmt$(a.gross_profit), 'period'),
-    card('Net Profit', fmt$(a.net_profit), 'period'),
-    card('ROAS (T3M)', fmtX(a.roas_all_t3m), 'blended', 'roas_all')
+    card('Net Profit', fmt$(a.net_profit), 'period')
   ].join('');
 
   // Funnel chart (16 weeks)
@@ -455,91 +494,166 @@ function renderLeads(range){
     ]
   });
 
-  // 2026 channel funnel table
   const cf = state.data.channelFunnel || [];
   document.getElementById('ch-funnel-table').innerHTML = `
     <table class="dt"><thead><tr>
-      <th>Channel</th><th>Total Deals</th><th>Active Leads</th><th>Disqualified</th>
-      <th>Qualified</th><th>Offers</th><th>UC</th><th>Inventory</th><th>Closed Won</th><th>Terminated</th>
-      <th>L→Q %</th><th>Q→UC %</th>
+      <th>Channel</th><th class="num">Total Deals</th><th class="num">Active Leads</th><th class="num">Disqualified</th>
+      <th class="num">Qualified</th><th class="num">Offers</th><th class="num">UC</th><th class="num">Inventory</th><th class="num">Closed Won</th><th class="num">Terminated</th>
+      <th class="num">L→Q %</th><th class="num">Q→UC %</th>
     </tr></thead><tbody>
     ${cf.map(r=>`<tr>
-      <td><b>${r.channel}</b></td><td>${fmtN(r.total_deals)}</td><td>${fmtN(r.active_leads)}</td>
-      <td>${fmtN(r.disqualified_leads)}</td><td>${fmtN(r.qualified_total)}</td>
-      <td>${fmtN(r.offers_made)}</td><td>${fmtN(r.active_under_contract)}</td>
-      <td>${fmtN(r.inventory_held)}</td><td>${fmtN(r.closed_won)}</td><td>${fmtN(r.terminated)}</td>
-      <td>${fmtPct(r.lead_to_qualified_pct)}</td><td>${fmtPct(r.qualified_to_uc_pct)}</td>
+      <td><b>${r.channel}</b></td><td class="num">${fmtN(r.total_deals)}</td><td class="num">${fmtN(r.active_leads)}</td>
+      <td class="num">${fmtN(r.disqualified_leads)}</td><td class="num">${fmtN(r.qualified_total)}</td>
+      <td class="num">${fmtN(r.offers_made)}</td><td class="num">${fmtN(r.active_under_contract)}</td>
+      <td class="num">${fmtN(r.inventory_held)}</td><td class="num">${fmtN(r.closed_won)}</td><td class="num">${fmtN(r.terminated)}</td>
+      <td class="num">${fmtPct(r.lead_to_qualified_pct)}</td><td class="num">${fmtPct(r.qualified_to_uc_pct)}</td>
     </tr>`).join('')}
     </tbody></table>`;
 }
 
 function renderPipeline(range){
-  const dt = state.data.dt || [];
-  // FIX: 'active' now means truly active — not closed/sold/terminated regardless of is_active flag
-  const active = dt.filter(d => d.is_active && !d.deleted_from_source &&
-    !['Terminated','Closed','Sold'].includes(d.acquisition_status||''));
-  const inUC = active; // same set now
-  const totalProj = active.reduce((s,d)=>s+(+d.projected_profit_override||+d.projected_profit||0),0);
-  const totalCost = active.reduce((s,d)=>s+(+d.purchase_price||0),0);
-  // FIX: future-only — close date must be today or later
+  const s = state.data.vsps || {};
+  const vsp = state.data.vsp || [];
   const today = new Date(); today.setHours(0,0,0,0);
-  const within30 = active.filter(d=>d.end_buyer_close_date && new Date(d.end_buyer_close_date)>=today && new Date(d.end_buyer_close_date)<=addDays(today,30));
-  const within60 = active.filter(d=>d.end_buyer_close_date && new Date(d.end_buyer_close_date)>=today && new Date(d.end_buyer_close_date)<=addDays(today,60));
-  const within90 = active.filter(d=>d.end_buyer_close_date && new Date(d.end_buyer_close_date)>=today && new Date(d.end_buyer_close_date)<=addDays(today,90));
-  const sumProj = arr => arr.reduce((s,d)=>s+(+d.projected_profit_override||+d.projected_profit||0),0);
+  const trulyActive = vsp.filter(d => d.is_active &&
+    !['Terminated','Closed','Sold'].includes(d.acquisition_status||''));
 
+  // ======= Active Pipeline cards =======
   document.getElementById('pl-cards').innerHTML = [
-    card('Active Deals', fmtN(active.length), 'in deal_tracker'),
-    card('In Pipeline (UC+DD+Listed)', fmtN(inUC.length)),
-    card('Cost Basis', fmt$(totalCost), 'capital deployed'),
-    card('Projected Profit (lifetime)', fmt$(totalProj), 'all active deals')
+    card('Active Deals', fmtN(s.active_deals), `${fmtN(s.in_uc)} UC · ${fmtN(s.in_dd)} DD`),
+    card('Site Works', fmtN(s.in_site_works), 'in DD prep work'),
+    card('At Closing', fmtN(s.at_closing), 'with title / closing'),
+    card('With End Buyer', fmtN(s.deals_with_buyer), `${fmtN(s.deals_listed)} listed`)
   ].join('');
 
+  // ======= Capital & Risk =======
+  document.getElementById('pl-capital').innerHTML = [
+    card('Pipeline Cost Basis', fmt$(s.total_purchase_price), 'sum of purchase prices'),
+    card('PA Cash at Risk', fmt$(s.total_pa_cash_at_risk), 'out-of-pocket'),
+    card('Loan Balance', fmt$(s.total_loan_balance), `${fmt$(s.total_jv_contributions)} JV`),
+    card('EMD at Risk', fmt$(s.total_emd_at_risk), 'deposited only')
+  ].join('');
+
+  // ======= Profit Outlook =======
+  document.getElementById('pl-profit').innerHTML = [
+    card('Quick Profit Est', fmt$(s.total_quick_profit_estimate), 'pre-listing rough est', '', true),
+    card('Projected Profit', fmt$(s.total_projected_profit), 'listing × .9 − 1.06 × purchase', '', true),
+    card('Estimated PA Net', fmt$(s.total_estimated_pa_net), 'after JV split', '', true),
+    card('Avg ROI · IRR', `${fmtPctRaw(s.avg_roi_pct)} · ${fmtPctRaw(s.avg_irr_pct)}`, 'on PA capital'),
+    card('Days Held (avg)', fmt1(s.avg_days_held), 'acq → end buyer'),
+    card('Days UC (avg)', fmt1(s.avg_days_under_contract), 'still under contract'),
+    card('Days on Market (avg)', fmt1(s.avg_days_on_market), 'listed deals'),
+    card('Confirmed Sale Total', fmt$(s.total_confirmed_revenue), 'end buyer signed')
+  ].join('');
+
+  // ======= Closing Timeline =======
+  const within = (d, days) => d.end_buyer_close_date && new Date(d.end_buyer_close_date)>=today && new Date(d.end_buyer_close_date)<=addDays(today,days);
+  const sumProj = arr => arr.reduce((sum,d)=>sum+(+d.actual_profit||+d.confirmed_profit||+d.projected_profit||+d.quick_profit_estimate||0), 0);
+  const w30 = trulyActive.filter(d=>within(d,30));
+  const w60 = trulyActive.filter(d=>within(d,60));
+  const w90 = trulyActive.filter(d=>within(d,90));
+  const noDate = trulyActive.filter(d=>!d.end_buyer_close_date);
   document.getElementById('pj-cards').innerHTML = [
-    card('Closing in 30 Days', fmt$(sumProj(within30)), `${within30.length} deals`),
-    card('Closing in 60 Days', fmt$(sumProj(within60)), `${within60.length} deals`),
-    card('Closing in 90 Days', fmt$(sumProj(within90)), `${within90.length} deals`),
-    card('No Close Date Set', fmtN(active.filter(d=>!d.end_buyer_close_date).length), 'needs attention')
+    card('Closing in 30 Days', fmt$(sumProj(w30)), `${w30.length} deals`),
+    card('Closing in 60 Days', fmt$(sumProj(w60)), `${w60.length} deals`),
+    card('Closing in 90 Days', fmt$(sumProj(w90)), `${w90.length} deals`),
+    card('No Close Date Set', fmtN(noDate.length), 'needs attention')
   ].join('');
 
-  // UC stages
+  // ======= Strategy Mix =======
+  document.getElementById('strategy-mix').innerHTML = [
+    card('Straight Purchase', fmtN(s.straight_purchase_deals), 'hold & resell retail'),
+    card('Double Close', fmtN(s.double_close_deals), 'back-to-back same-day'),
+    card('Assignment', fmtN(s.assignment_deals), 'never take title'),
+    card('Subdivide', fmtN(s.subdivide_deals), 'split into lots')
+  ].join('');
+
+  // ======= Subdivide Tracker =======
+  const subdivides = vsp.filter(d => d.closing_type === 'Subdivide Purchase' && d.is_active);
+  if(subdivides.length === 0){
+    document.getElementById('subdivide-card').innerHTML = `<div class="card text-sm text-gray-500">No active subdivide deals.</div>`;
+  } else {
+    const totalLots = s.total_subdivide_lots || 0;
+    const lotsSold = s.total_subdivide_lots_sold || 0;
+    const subdivRev = s.total_subdivide_revenue || 0;
+    const sellThru = totalLots ? (lotsSold/totalLots*100) : 0;
+    document.getElementById('subdivide-card').innerHTML = `
+      <div class="card">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+          ${card('Active Subdivide Deals', fmtN(subdivides.length))}
+          ${card('Total Lots', fmtN(totalLots), `${fmtN(lotsSold)} sold (${fmtPct(sellThru)})`)}
+          ${card('Lots Remaining', fmtN(totalLots-lotsSold))}
+          ${card('Revenue to Date', fmt$(subdivRev), 'closed lots')}
+        </div>
+        <table class="dt"><thead><tr>
+          <th>Deal</th><th>Status</th><th class="num">Total Lots</th><th class="num">Sold</th>
+          <th class="num">Revenue</th><th class="num">Avg/Lot</th><th class="num">Quick Est</th><th class="num">Days Held</th>
+        </tr></thead><tbody>
+        ${subdivides.map(d=>{
+          const lots = d.subdivide_total_lots || 0;
+          const sold = d.subdivide_lots_sold || 0;
+          const rev = d.subdivide_total_revenue || 0;
+          const avgLot = sold ? rev/sold : null;
+          return `<tr>
+            <td><b>${d.deal_name||'—'}</b></td>
+            <td>${d.acquisition_status||'—'}</td>
+            <td class="num">${fmtN(lots)}</td>
+            <td class="num">${fmtN(sold)}</td>
+            <td class="num">${fmt$(rev)}</td>
+            <td class="num">${fmt$(avgLot)}</td>
+            <td class="num">${fmt$(d.quick_profit_estimate)}</td>
+            <td class="num">${fmtN(d.days_held)}</td>
+          </tr>`;
+        }).join('')}
+        </tbody></table>
+      </div>`;
+  }
+
+  // ======= UC stages health =======
   const ph = (state.data.pipelineHealth || []).filter(s=>s.pipeline_name==='Under Contract');
   document.getElementById('uc-stages').innerHTML = `<table class="dt"><thead><tr>
-    <th>Stage</th><th>Deals</th><th>Avg Days in Stage</th><th>Stale (>14d)</th><th>Total Value</th>
+    <th>Stage</th><th class="num">Deals</th><th class="num">Avg Days in Stage</th><th class="num">Stale (&gt;14d)</th><th class="num">Total Value</th>
   </tr></thead><tbody>${ph.map(s=>`<tr>
-    <td><b>${s.stage_name}</b></td><td>${fmtN(s.deals)}</td>
-    <td>${fmt1(s.avg_days_in_stage)}</td><td>${fmtN(s.stale_deals)}</td>
-    <td>${fmt$(s.total_value)}</td></tr>`).join('')}</tbody></table>`;
+    <td><b>${s.stage_name}</b></td><td class="num">${fmtN(s.deals)}</td>
+    <td class="num">${fmt1(s.avg_days_in_stage)}</td><td class="num">${fmtN(s.stale_deals)}</td>
+    <td class="num">${fmt$(s.total_value)}</td></tr>`).join('')}</tbody></table>`;
 
-  // Active deals table
+  // ======= Active Deals table — now from v_sales_pipeline (richer) =======
   document.getElementById('active-deals').innerHTML = `<table class="dt"><thead><tr>
-    <th>Deal</th><th>Status</th><th>Source</th><th>State</th><th>Acres</th>
-    <th>Contract</th><th>Days UC</th><th>Purchase</th><th>Listing</th><th>Proj. Profit</th>
-  </tr></thead><tbody>${active.slice(0,40).map(d=>`<tr>
-    <td><b>${d.deal_name||'—'}</b></td><td>${d.acquisition_status||'—'}</td>
-    <td>${d.lead_source||'—'}</td><td>${d.state||'—'}</td><td>${fmt1(d.acreage)}</td>
-    <td>${fmtD(d.contract_date)}</td><td>${fmtN(d.days_under_contract)}</td>
-    <td>${fmt$(d.purchase_price)}</td><td>${fmt$(d.listing_price)}</td>
-    <td>${fmt$(d.projected_profit_override||d.projected_profit)}</td></tr>`).join('')}</tbody></table>`;
+    <th>Deal</th><th>Status</th><th>Strategy</th><th>Source</th><th>State</th>
+    <th class="num">Acres</th><th class="num">Days UC</th><th class="num">Purchase</th>
+    <th class="num">Quick Est</th><th class="num">Projected</th><th class="num">PA Net</th>
+    <th class="num">ROI</th><th class="num">IRR</th>
+  </tr></thead><tbody>${trulyActive.slice(0,40).map(d=>`<tr>
+    <td><b>${d.deal_name||'—'}</b></td>
+    <td>${d.acquisition_status||'—'}</td>
+    <td>${d.closing_type ? `<span class="${strategyClass(d.closing_type)}">${d.closing_type}</span>` : '—'}</td>
+    <td>${d.lead_source||'—'}</td>
+    <td>${d.state||'—'}</td>
+    <td class="num">${fmt1(d.acreage)}</td>
+    <td class="num">${fmtN(d.days_under_contract)}</td>
+    <td class="num">${fmt$(d.purchase_price)}</td>
+    <td class="num">${fmt$(d.quick_profit_estimate)}</td>
+    <td class="num">${fmt$(d.projected_profit)}</td>
+    <td class="num">${fmt$(d.estimated_pa_net)}</td>
+    <td class="num">${d.deal_roi_pct!=null?fmtPctRaw(d.deal_roi_pct*100):'—'}</td>
+    <td class="num">${d.deal_irr_pct!=null?fmtPctRaw(d.deal_irr_pct*100):'—'}</td>
+  </tr>`).join('')}</tbody></table>`;
 
-  // Stale deals
+  // ======= Stale =======
   const stale = state.data.stale || [];
   document.getElementById('stale-deals').innerHTML = `<table class="dt"><thead><tr>
-    <th>Deal</th><th>Pipeline</th><th>Stage</th><th>Owner</th><th>Days Since Update</th><th>Days in Stage</th><th>Source</th>
+    <th>Deal</th><th>Pipeline</th><th>Stage</th><th>Owner</th><th class="num">Days Since Update</th><th class="num">Days in Stage</th><th>Source</th>
   </tr></thead><tbody>${stale.map(s=>`<tr>
     <td><b>${s.title||'—'}</b></td><td>${s.pipeline_name||'—'}</td><td>${s.stage_name||'—'}</td>
-    <td>${s.owner_name||'—'}</td><td>${fmtN(s.days_since_update)}</td>
-    <td>${fmtN(s.days_in_stage)}</td><td>${s.lead_source||'—'}</td></tr>`).join('')}</tbody></table>`;
+    <td>${s.owner_name||'—'}</td><td class="num">${fmtN(s.days_since_update)}</td>
+    <td class="num">${fmtN(s.days_in_stage)}</td><td>${s.lead_source||'—'}</td></tr>`).join('')}</tbody></table>`;
 }
 
 function renderTeam(range){
   const a = aggKpi(state.data.kpi, range);
-  // AM uses Pipedrive-driven KPIs (qualifications, offers, contracts)
-  // Plus quo_daily for Jonathan's call activity
   const quo = state.data.quo || [];
   const sumQuo = (user, days, key) => quo.filter(q=>q.user_name===user).slice(0, days).reduce((s,r)=>s+(+r[key]||0),0);
-  const jWeeks = quo.filter(q=>q.user_name==='Jonathan').length;
-  const jaredWeeks = quo.filter(q=>q.user_name==='Jared').length;
 
   document.getElementById('am-cards').innerHTML = [
     card('Qualifications', fmtN(a.qualified_leads_all), 'period (Pipedrive)'),
@@ -555,31 +669,48 @@ function renderTeam(range){
     card('Active Days (4w)', fmtN(sumQuo('Jared',4,'days_active')), '')
   ].join('');
 
-  // Lead Manager - Manny
+  // ===== Lead Manager Manny — TWO ROWS =====
+  // Row 1: Activity (JustCall / v_lead_manager_weekly)
   const lm = state.data.lm || [];
   const lm4 = lm.slice(0,4);
   const lmSum = k => lm4.reduce((s,r)=>s+(+r[k]||0),0);
   const lmAvg = k => { const v=lm4.map(r=>+r[k]).filter(x=>!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:null; };
-  document.getElementById('lm-cards').innerHTML = [
+  document.getElementById('lm-activity').innerHTML = [
     card('Calls (4w)', fmtN(lmSum('total_calls')), `${fmtN(lmSum('outbound_calls'))} outbound`),
     card('Talk Hours (4w)', fmt1(lmSum('talk_hours')), ''),
     card('Answer Rate', fmtPct(lmAvg('answer_rate')), 'avg'),
     card('SMS Activity', fmtN(lmSum('sms_sent')+lmSum('sms_received')), 'sent + received')
   ].join('');
 
-  // SMS - Tamar
+  // Row 2: Outcomes (Pipedrive stage history via v_lead_manager_outcomes_weekly)
+  const lmOut = (state.data.lmOut || []).filter(r=>r.user_name==='Manny').slice(0,4);
+  const oSum = k => lmOut.reduce((s,r)=>s+(+r[k]||0),0);
+  const dealsTouched = oSum('deals_touched');
+  const quals = oSum('qualifications_generated');
+  const disq = oSum('disqualifications');
+  const qRate = (quals + disq) ? (quals / (quals + disq) * 100) : null;
+  document.getElementById('lm-outcomes').innerHTML = [
+    card('Deals Touched (4w)', fmtN(dealsTouched), `${fmtN(oSum('movements'))} stage moves`),
+    card('Qualifications (4w)', fmtN(quals), 'sent to AM pipeline'),
+    card('Disqualifications (4w)', fmtN(disq), 'leads dropped'),
+    card('Q-Rate', fmtPct(qRate), 'qualified / decided')
+  ].join('');
+
+  // ===== SMS - Tamar =====
   const sms = state.data.sms || [];
   const sms4 = sms.slice(0,4);
   const smsSum = k => sms4.reduce((s,r)=>s+(+r[k]||0),0);
   const smsAvg = k => { const v=sms4.map(r=>+r[k]).filter(x=>!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:null; };
+  const totalTexts = smsSum('total_texts_sent');
+  const totalLeads = smsSum('total_leads_to_crm');
   document.getElementById('sms-cards').innerHTML = [
-    card('Texts Sent (4w)', fmtN(smsSum('total_texts_sent')), ''),
-    card('Leads to CRM (4w)', fmtN(smsSum('total_leads_to_crm')), `${fmt1(smsSum('total_leads_to_crm')/smsSum('total_texts_sent')*1000)} per 1k texts`),
+    card('Texts Sent (4w)', fmtN(totalTexts), ''),
+    card('Leads to CRM (4w)', fmtN(totalLeads), totalTexts ? `${fmt1(totalLeads/totalTexts*1000)} per 1k texts` : ''),
     card('Response Rate', fmtPct(smsAvg('avg_response_rate')), '4w avg'),
     card('Deliverability', fmtPct(smsAvg('avg_deliverability_rate')), '4w avg')
   ].join('');
 
-  // Cold caller team - last 4 weeks aggregated by name
+  // ===== Cold caller team — last 4 weeks =====
   const cc = state.data.cc || [];
   const recentWeeks = cc.length ? Array.from(new Set(cc.map(c=>c.week_start))).slice(0,4) : [];
   const ccRecent = cc.filter(c=>recentWeeks.includes(c.week_start));
@@ -595,12 +726,12 @@ function renderTeam(range){
   const callers = Object.entries(byCaller).map(([n,d])=>({n,...d, cpl:d.leads?d.pay/d.leads:null, cpq:d.qual?d.pay/d.qual:null}))
     .sort((a,b)=>b.leads-a.leads);
   document.getElementById('cc-table').innerHTML = `<table class="dt"><thead><tr>
-    <th>Caller</th><th>Leads</th><th>Qualified</th><th>Q Rate</th><th>Calls</th><th>Hours</th><th>Pay</th><th>CPL</th><th>CPQ</th>
+    <th>Caller</th><th class="num">Leads</th><th class="num">Qualified</th><th class="num">Q Rate</th><th class="num">Calls</th><th class="num">Hours</th><th class="num">Pay</th><th class="num">CPL</th><th class="num">CPQ</th>
   </tr></thead><tbody>${callers.map(c=>`<tr>
-    <td><b>${c.n}</b></td><td>${fmtN(c.leads)}</td><td>${fmtN(c.qual)}</td>
-    <td>${c.leads?fmtPct(c.qual/c.leads*100):'—'}</td><td>${fmtN(c.calls)}</td>
-    <td>${fmt1(c.hours)}</td><td>${fmt$0(c.pay)}</td>
-    <td>${fmt$0(c.cpl)}</td><td>${fmt$0(c.cpq)}</td></tr>`).join('')}</tbody></table>`;
+    <td><b>${c.n}</b></td><td class="num">${fmtN(c.leads)}</td><td class="num">${fmtN(c.qual)}</td>
+    <td class="num">${c.leads?fmtPct(c.qual/c.leads*100):'—'}</td><td class="num">${fmtN(c.calls)}</td>
+    <td class="num">${fmt1(c.hours)}</td><td class="num">${fmt$0(c.pay)}</td>
+    <td class="num">${fmt$0(c.cpl)}</td><td class="num">${fmt$0(c.cpq)}</td></tr>`).join('')}</tbody></table>`;
 }
 
 function renderCosts(range){
@@ -636,16 +767,16 @@ function renderCosts(range){
   });
 
   document.getElementById('cpx-table').innerHTML = `<table class="dt"><thead><tr>
-    <th>Metric</th><th>All</th><th>Cold Call</th><th>SMS</th><th>Direct Mail</th>
+    <th>Metric</th><th class="num">All</th><th class="num">Cold Call</th><th class="num">SMS</th><th class="num">Direct Mail</th>
   </tr></thead><tbody>
-    <tr><td><b>Cost / Lead (T4W)</b></td><td>${fmt$0(a.cost_per_lead_t4w)}</td>
-      <td>${fmt$0(a.cost_per_lead_cc_t4w)}</td><td>${fmt$0(a.cost_per_lead_sms_t4w)}</td>
-      <td>${fmt$0(a.cost_per_lead_dm_t4w)}</td></tr>
-    <tr><td><b>Cost / Qualified (T4W)</b></td><td>${fmt$0(a.cost_per_qualified_t4w)}</td>
-      <td>${fmt$0(a.cost_per_qualified_cc_t4w)}</td><td>${fmt$0(a.cost_per_qualified_sms_t4w)}</td>
-      <td>${fmt$0(a.cost_per_qualified_dm_t4w)}</td></tr>
-    <tr><td><b>ROAS (T3M)</b></td><td>${fmtX(a.roas_all_t3m)}</td>
-      <td>${fmtX(a.roas_cc_t3m)}</td><td>${fmtX(a.roas_sms_t3m)}</td><td>${fmtX(a.roas_dm_t3m)}</td></tr>
+    <tr><td><b>Cost / Lead (T4W)</b></td><td class="num">${fmt$0(a.cost_per_lead_t4w)}</td>
+      <td class="num">${fmt$0(a.cost_per_lead_cc_t4w)}</td><td class="num">${fmt$0(a.cost_per_lead_sms_t4w)}</td>
+      <td class="num">${fmt$0(a.cost_per_lead_dm_t4w)}</td></tr>
+    <tr><td><b>Cost / Qualified (T4W)</b></td><td class="num">${fmt$0(a.cost_per_qualified_t4w)}</td>
+      <td class="num">${fmt$0(a.cost_per_qualified_cc_t4w)}</td><td class="num">${fmt$0(a.cost_per_qualified_sms_t4w)}</td>
+      <td class="num">${fmt$0(a.cost_per_qualified_dm_t4w)}</td></tr>
+    <tr><td><b>ROAS (T3M)</b></td><td class="num">${fmtX(a.roas_all_t3m)}</td>
+      <td class="num">${fmtX(a.roas_cc_t3m)}</td><td class="num">${fmtX(a.roas_sms_t3m)}</td><td class="num">${fmtX(a.roas_dm_t3m)}</td></tr>
   </tbody></table>`;
 }
 
@@ -676,7 +807,6 @@ function renderTrends(){
     ]
   });
 
-  // Calls activity from quo (Jonathan + Jared)
   const quo = state.data.quo || [];
   const weeks = Array.from(new Set(quo.map(q=>q.week_start))).sort();
   const jonCalls = weeks.map(ws=>{ const r=quo.find(q=>q.week_start===ws && q.user_name==='Jonathan'); return r?+r.total_calls||0:0; });
