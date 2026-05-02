@@ -1,849 +1,1831 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Principal Acres — CEO Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-  body{font-family:'Inter',system-ui,sans-serif}
-  .tab-btn{transition:all .15s;color:#6b7280;border-bottom:2px solid transparent;white-space:nowrap}
-  .tab-btn:hover{color:#111827}
-  .tab-btn.active{color:#111827;border-bottom-color:#111827;font-weight:600}
-  .filter-btn{transition:all .15s}
-  .filter-btn.active{background:#111827!important;color:white!important}
-  .kpi-card{background:white;border:1px solid #e5e7eb;border-radius:10px;padding:14px}
-  .kpi-card.accent{background:linear-gradient(135deg,#fafbff 0%,#f4f5fb 100%);border-color:#dde1f0}
-  .kpi-label{font-size:10.5px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
-  .kpi-value{font-size:24px;font-weight:700;color:#111827;margin-top:4px;line-height:1.1}
-  .kpi-sub{font-size:11px;color:#6b7280;margin-top:4px}
-  .kpi-good{color:#059669}
-  .kpi-bad{color:#dc2626}
-  .pill{display:inline-flex;align-items:center;padding:1px 7px;border-radius:9px;font-size:10.5px;font-weight:600;margin-left:6px}
-  .pill-g{background:#dcfce7;color:#166534}
-  .pill-y{background:#fef3c7;color:#854408}
-  .pill-r{background:#fee2e2;color:#991818}
-  .pill-x{background:#f3f4f6;color:#374151}
-  .pill-strategy{display:inline-block;padding:1px 8px;border-radius:9px;font-size:10px;font-weight:600;background:#eef2ff;color:#3730a3}
-  .pill-strategy.dc{background:#fef3c7;color:#854408}
-  .pill-strategy.as{background:#dcfce7;color:#166534}
-  .pill-strategy.sd{background:#f3e8ff;color:#6b21a8}
-  .sec-h{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin:0 0 10px 0}
-  .card{background:white;border:1px solid #e5e7eb;border-radius:10px;padding:18px}
-  .card-t{font-size:14px;font-weight:600;color:#111827;margin-bottom:14px}
-  .card-t-sub{font-size:11px;font-weight:500;color:#6b7280;margin-left:6px}
-  table.dt{width:100%;border-collapse:collapse}
-  table.dt th{text-align:left;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#6b7280;padding:9px 11px;border-bottom:1px solid #e5e7eb}
-  table.dt td{font-size:13px;color:#111827;padding:9px 11px;border-bottom:1px solid #f3f4f6}
-  table.dt tr:hover{background:#f9fafb}
-  table.dt td.num{text-align:right;font-variant-numeric:tabular-nums}
-  table.dt th.num{text-align:right}
-  .spinner{display:inline-block;width:14px;height:14px;border:2px solid #e5e7eb;border-top-color:#111827;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:6px}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  [hidden]{display:none!important}
+  :root {
+    --bg: #0a0b10;
+    --bg-elevated: #11131a;
+    --card: #161823;
+    --card-hover: #1c1f2c;
+    --border: #252836;
+    --border-strong: #353a4d;
+    --text: #e8e9ee;
+    --text-muted: #8b8fa3;
+    --text-dim: #5a5e72;
+    --accent: #6ea8ff;
+    --accent-dim: #4a78c0;
+    --green: #4ade80;
+    --green-dim: #15803d;
+    --amber: #fbbf24;
+    --amber-dim: #b45309;
+    --red: #f87171;
+    --red-dim: #b91c1c;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; font-feature-settings: 'tnum'; }
+  .num { font-family: 'JetBrains Mono', monospace; font-feature-settings: 'tnum'; font-weight: 500; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .card-clickable:hover {
+    background: var(--card-hover);
+    border-color: var(--border-strong);
+    cursor: pointer;
+  }
+  .card-clickable:active { transform: scale(0.998); }
+  .label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .label-big {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.1;
+    font-feature-settings: 'tnum';
+  }
+  .stat-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.02em;
+  }
+  .pill-green { background: rgba(74, 222, 128, 0.12); color: var(--green); border: 1px solid rgba(74, 222, 128, 0.25); }
+  .pill-amber { background: rgba(251, 191, 36, 0.12); color: var(--amber); border: 1px solid rgba(251, 191, 36, 0.25); }
+  .pill-red   { background: rgba(248, 113, 113, 0.12); color: var(--red);   border: 1px solid rgba(248, 113, 113, 0.25); }
+  .pill-neutral { background: rgba(110, 168, 255, 0.10); color: var(--accent); border: 1px solid rgba(110, 168, 255, 0.20); }
+  .pill-dim { background: rgba(139, 143, 163, 0.08); color: var(--text-dim); border: 1px solid var(--border); }
+  .goal-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+  }
+  .goal-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .goal-bar-fill.green { background: linear-gradient(90deg, var(--green-dim), var(--green)); }
+  .goal-bar-fill.amber { background: linear-gradient(90deg, var(--amber-dim), var(--amber)); }
+  .goal-bar-fill.red { background: linear-gradient(90deg, var(--red-dim), var(--red)); }
+  .period-btn {
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.12s;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 500;
+  }
+  .period-btn:hover { border-color: var(--border-strong); color: var(--text); }
+  .period-btn.active {
+    background: var(--accent);
+    color: #0a0b10;
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .tab-btn {
+    padding: 0.7rem 1.1rem;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+  }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  .funnel-stage {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .funnel-stage:hover {
+    background: var(--card-hover);
+    border-color: var(--accent-dim);
+  }
+  .funnel-arrow {
+    text-align: center;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.25rem 0;
+    line-height: 1.3;
+  }
+  .funnel-arrow .pct { color: var(--text-muted); font-weight: 500; }
+  .funnel-arrow .ratio { color: var(--text-dim); }
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  table.data-table th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border-strong);
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    background: var(--bg-elevated);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  table.data-table td {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  table.data-table td.num { font-family: 'JetBrains Mono', monospace; font-feature-settings: 'tnum'; }
+  table.data-table tr:hover td { background: var(--card-hover); }
+  table.data-table a { color: var(--accent); text-decoration: none; }
+  table.data-table a:hover { text-decoration: underline; }
+  #drill-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 40;
+    display: none;
+    backdrop-filter: blur(4px);
+  }
+  #drill-overlay.open { display: block; }
+  #drill-panel {
+    position: fixed;
+    top: 0; right: 0;
+    width: 100%;
+    max-width: 720px;
+    height: 100vh;
+    background: var(--bg-elevated);
+    border-left: 1px solid var(--border-strong);
+    z-index: 41;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -8px 0 32px rgba(0,0,0,0.5);
+  }
+  #drill-panel.open { transform: translateX(0); }
+  #drill-panel .header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  #drill-panel .body { flex: 1; overflow-y: auto; padding: 1rem 1.5rem; }
+  .close-btn {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-muted); width: 32px; height: 32px; border-radius: 6px;
+    cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+  }
+  .close-btn:hover { color: var(--text); border-color: var(--border-strong); }
+  #picker-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 50;
+    display: none;
+    backdrop-filter: blur(4px);
+  }
+  #picker-overlay.open { display: flex; align-items: center; justify-content: center; }
+  #picker-panel {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    width: 90%; max-width: 640px;
+    max-height: 80vh;
+    display: flex; flex-direction: column;
+    box-shadow: var(--shadow);
+  }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+  .data-window {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: normal;
+    margin-left: 0.5rem;
+  }
+  .section-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.01em;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .section-title .accent-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .info-tip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    color: var(--text-dim);
+    font-size: 0.65rem;
+    cursor: help;
+    margin-left: 0.4rem;
+    position: relative;
+  }
+  .info-tip:hover { color: var(--accent); border-color: var(--accent-dim); }
+  .info-tip:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 100%; left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: normal;
+    width: 240px;
+    z-index: 100;
+    box-shadow: var(--shadow);
+    text-align: left;
+    line-height: 1.4;
+    font-weight: normal;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .delta { font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+  .delta-up { color: var(--green); }
+  .delta-down { color: var(--red); }
+  .delta-flat { color: var(--text-dim); }
+  #app-loading {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 1rem;
+    transition: opacity 0.3s;
+  }
+  #app-loading.hidden { opacity: 0; pointer-events: none; }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .err-banner {
+    background: rgba(248, 113, 113, 0.10);
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    color: var(--red);
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+  .picker-row {
+    padding: 0.6rem 1.5rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  .picker-row:hover { background: var(--card-hover); }
+  .picker-row .name { font-size: 0.85rem; font-weight: 500; }
+  .picker-row .desc { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
 </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body>
 
-<header class="bg-white border-b border-gray-200 sticky top-0 z-50">
-  <div class="max-w-[80rem] mx-auto px-6 py-3 flex items-center justify-between">
+<div id="app-loading">
+  <div class="spinner"></div>
+  <div style="color: var(--text-muted); font-size: 0.85rem;">Loading dashboard…</div>
+</div>
+
+<header style="border-bottom: 1px solid var(--border); background: var(--bg-elevated); position: sticky; top: 0; z-index: 30;">
+  <div style="max-width: 1600px; margin: 0 auto; padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
     <div>
-      <h1 class="text-base font-semibold text-gray-900">Principal Acres</h1>
-      <div class="text-xs text-gray-500">CEO Dashboard</div>
+      <div style="font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em;">Principal Acres</div>
+      <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px;">CEO Operations Dashboard</div>
     </div>
-    <div class="flex items-center gap-3">
-      <div id="last-refresh" class="text-xs text-gray-500">Loading…</div>
-      <label class="flex items-center gap-1.5 text-xs text-gray-600 cursor-pointer">
-        <input id="auto-refresh" type="checkbox" checked> Auto (5m)
-      </label>
-      <button id="refresh-btn" class="px-3 py-1.5 bg-gray-900 text-white rounded-md text-xs font-medium hover:bg-gray-700">
-        <span id="refresh-label">Refresh</span>
-      </button>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <div style="text-align: right;">
+        <div id="last-updated" class="mono" style="font-size: 0.75rem; color: var(--text-muted);">—</div>
+        <div style="font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em;">Last refreshed</div>
+      </div>
+      <button id="refresh-btn" class="period-btn" style="padding: 0.5rem 0.75rem;" title="Refresh">↻</button>
     </div>
   </div>
-  <nav class="max-w-[80rem] mx-auto px-6">
-    <div class="flex gap-6 overflow-x-auto">
-      <button class="tab-btn active py-3 text-sm" data-tab="overview">Overview</button>
-      <button class="tab-btn py-3 text-sm" data-tab="leads">Lead Generation</button>
-      <button class="tab-btn py-3 text-sm" data-tab="pipeline">Pipeline & Acquisitions</button>
-      <button class="tab-btn py-3 text-sm" data-tab="team">Team Performance</button>
-      <button class="tab-btn py-3 text-sm" data-tab="costs">Marketing & Costs</button>
-      <button class="tab-btn py-3 text-sm" data-tab="trends">Trends</button>
-    </div>
-  </nav>
 </header>
 
-<div class="bg-white border-b border-gray-200">
-  <div class="max-w-[80rem] mx-auto px-6 py-2.5 flex items-center gap-2 flex-wrap">
-    <span class="text-xs text-gray-500 font-medium mr-1">Period:</span>
-    <button class="filter-btn active px-3 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700" data-filter="this_week">This Week</button>
-    <button class="filter-btn px-3 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700" data-filter="last_week">Last Week</button>
-    <button class="filter-btn px-3 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700" data-filter="mtd">MTD</button>
-    <button class="filter-btn px-3 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700" data-filter="last_month">Last Month</button>
-    <button class="filter-btn px-3 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700" data-filter="ytd">YTD</button>
-    <button class="filter-btn px-3 py-1 text-xs font-medium rounded-md bg-gray-100 text-gray-700" data-filter="projected">Projected (60d)</button>
-    <div class="flex-1"></div>
-    <span id="period-label" class="text-xs text-gray-600 font-medium"></span>
+<div style="border-bottom: 1px solid var(--border); background: var(--bg);">
+  <div style="max-width: 1600px; margin: 0 auto; padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+    <span class="label" style="margin-right: 0.5rem;">Period</span>
+    <button class="period-btn" data-period="this_week">This Week</button>
+    <button class="period-btn" data-period="last_week">Last Week</button>
+    <button class="period-btn" data-period="mtd">MTD</button>
+    <button class="period-btn" data-period="last_month">Last Month</button>
+    <button class="period-btn" data-period="last_30">Last 30d</button>
+    <button class="period-btn" data-period="last_90">Last 90d</button>
+    <button class="period-btn" data-period="ytd">YTD</button>
+    <button class="period-btn" data-period="custom">Custom…</button>
+    <div id="custom-range" style="display: none; gap: 0.4rem; align-items: center; margin-left: 0.5rem;">
+      <input type="date" id="custom-start" class="period-btn mono" style="padding: 0.3rem 0.5rem;" />
+      <span style="color: var(--text-dim);">→</span>
+      <input type="date" id="custom-end" class="period-btn mono" style="padding: 0.3rem 0.5rem;" />
+      <button id="custom-apply" class="period-btn" style="background: var(--accent); color: #0a0b10; border-color: var(--accent);">Apply</button>
+    </div>
+    <div id="period-display" class="mono" style="margin-left: auto; font-size: 0.8rem; color: var(--text-muted);">—</div>
   </div>
 </div>
 
-<main class="max-w-[80rem] mx-auto px-6 py-6">
-  <div id="error-banner" hidden class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md mb-4 text-sm"></div>
+<nav style="border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 73px; z-index: 25;">
+  <div style="max-width: 1600px; margin: 0 auto; padding: 0 1rem; display: flex; gap: 0.25rem; overflow-x: auto;">
+    <button class="tab-btn active" data-tab="daily">Daily Pulse</button>
+    <button class="tab-btn" data-tab="scorecard">Weekly Scorecard</button>
+    <button class="tab-btn" data-tab="leads">Lead Generation</button>
+    <button class="tab-btn" data-tab="pipeline">Pipeline &amp; Profit</button>
+    <button class="tab-btn" data-tab="team">Team Performance</button>
+    <button class="tab-btn" data-tab="custom">Custom View</button>
+    <button class="tab-btn" data-tab="trends">Trends</button>
+  </div>
+</nav>
 
-  <!-- OVERVIEW -->
-  <section data-section="overview">
-    <h2 class="sec-h">Activity & Pipeline</h2>
-    <div id="ov-activity" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-    <h2 class="sec-h mt-7">Conversion & Efficiency</h2>
-    <div id="ov-conversion" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-    <h2 class="sec-h mt-7">Financials</h2>
-    <div id="ov-financials" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-7">
-      <div class="card lg:col-span-2"><h3 class="card-t">Weekly Funnel — Last 16 Weeks</h3><canvas id="c-funnel" height="110"></canvas></div>
-      <div class="card"><h3 class="card-t">Lead Source Mix (Period)</h3><canvas id="c-mix" height="170"></canvas></div>
+<main style="max-width: 1600px; margin: 0 auto; padding: 1.5rem;">
+  <div id="error-container"></div>
+
+  <section id="tab-daily" class="tab-pane active">
+    <div class="section-title">Yesterday's Pulse <span class="data-window" id="daily-window"></span><span class="accent-line"></span></div>
+    <div id="daily-yesterday" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;"></div>
+    <div class="section-title" style="margin-top: 2rem;">Last 7 Days <span class="accent-line"></span></div>
+    <div class="card" style="padding: 0;"><div id="daily-table-wrap" style="overflow-x: auto;"></div></div>
+    <div class="section-title" style="margin-top: 2rem;">Active Pipeline State <span class="accent-line"></span></div>
+    <div id="daily-pipeline-state" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;"></div>
+  </section>
+
+  <section id="tab-scorecard" class="tab-pane">
+    <div class="section-title">Team Scorecard <span class="data-window" id="scorecard-window"></span><span class="accent-line"></span></div>
+    <div id="scorecard-container" style="display: flex; flex-direction: column; gap: 1.5rem;"></div>
+  </section>
+
+  <section id="tab-leads" class="tab-pane">
+    <div class="section-title">Funnel <span class="accent-line"></span></div>
+    <div id="funnel-block"></div>
+    <div class="section-title" style="margin-top: 2rem;">Cost &amp; ROAS <span class="accent-line"></span></div>
+    <div id="cost-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;"></div>
+    <div class="section-title" style="margin-top: 2rem;">Channel Performance <span class="accent-line"></span></div>
+    <div id="channel-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem;"></div>
+  </section>
+
+  <section id="tab-pipeline" class="tab-pane">
+    <div class="section-title">Pipeline Snapshot <span class="accent-line"></span></div>
+    <div id="pipeline-overview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;"></div>
+    <div class="section-title" style="margin-top: 2rem;">Active Deals by Stage <span class="accent-line"></span></div>
+    <div class="card" style="padding: 0;"><div id="pipeline-stages-table" style="overflow-x: auto;"></div></div>
+    <div class="section-title" style="margin-top: 2rem;">Stale Deals <span class="data-window">No activity 14+ days</span><span class="accent-line"></span></div>
+    <div class="card" style="padding: 0;"><div id="stale-deals-table" style="overflow-x: auto;"></div></div>
+    <div class="section-title" style="margin-top: 2rem;">Closed Deals <span class="data-window" id="closed-window"></span><span class="accent-line"></span></div>
+    <div class="card" style="padding: 0;"><div id="closed-deals-table" style="overflow-x: auto;"></div></div>
+  </section>
+
+  <section id="tab-team" class="tab-pane">
+    <div class="section-title">Cold Callers <span class="data-window" id="cc-window"></span><span class="accent-line"></span></div>
+    <div id="cc-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.75rem;"></div>
+    <div class="section-title" style="margin-top: 2rem;">Manny — Lead Manager <span class="data-window">Last 14 days</span><span class="accent-line"></span></div>
+    <div id="manny-section"></div>
+    <div class="section-title" style="margin-top: 2rem;">Jonathan &amp; Jared <span class="data-window">Last 14 days</span><span class="accent-line"></span></div>
+    <div id="aj-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;"></div>
+    <div class="section-title" style="margin-top: 2rem;">Tamar — Texts &amp; Julia — Mailers <span class="accent-line"></span></div>
+    <div id="tj-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;"></div>
+  </section>
+
+  <section id="tab-custom" class="tab-pane">
+    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem;">
+      <span class="label">Preset</span>
+      <select id="preset-select" class="period-btn mono" style="padding: 0.4rem 0.6rem; min-width: 200px;"></select>
+      <button id="preset-save" class="period-btn">Save as preset…</button>
+      <button id="preset-delete" class="period-btn">Delete preset</button>
+      <button id="picker-open" class="period-btn" style="background: var(--accent); color: #0a0b10; border-color: var(--accent); margin-left: auto;">+ Add metric</button>
+      <button id="custom-clear" class="period-btn">Clear all</button>
+    </div>
+    <div id="custom-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;"></div>
+    <div id="custom-empty" style="text-align: center; padding: 4rem 1rem; color: var(--text-dim); display: none;">
+      <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">No metrics added yet</div>
+      <div style="font-size: 0.85rem;">Click <strong>+ Add metric</strong> above to start building your view.</div>
     </div>
   </section>
 
-  <!-- LEAD GEN -->
-  <section data-section="leads" hidden>
-    <h2 class="sec-h">Channel Performance (Period)</h2>
-    <div id="ch-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"></div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-7">
-      <div class="card"><h3 class="card-t">Lead Volume by Channel (16 Weeks)</h3><canvas id="c-leads-channel" height="140"></canvas></div>
-      <div class="card"><h3 class="card-t">Cost per Lead by Channel</h3><canvas id="c-cpl" height="140"></canvas></div>
-    </div>
-    <h2 class="sec-h mt-7">All-Time Channel Funnel (2026)</h2>
-    <div class="card"><div id="ch-funnel-table" class="overflow-x-auto"></div></div>
-  </section>
-
-  <!-- PIPELINE -->
-  <section data-section="pipeline" hidden>
-    <h2 class="sec-h">Active Pipeline <span class="text-gray-400 normal-case font-normal tracking-normal">— from <code class="bg-gray-100 px-1 rounded">v_sales_pipeline_summary</code></span></h2>
-    <div id="pl-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-
-    <h2 class="sec-h mt-7">Capital & Risk</h2>
-    <div id="pl-capital" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-
-    <h2 class="sec-h mt-7">Profit Outlook</h2>
-    <div id="pl-profit" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-
-    <h2 class="sec-h mt-7">Closing Timeline (from end_buyer_close_date)</h2>
-    <div id="pj-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-
-    <h2 class="sec-h mt-7">Strategy Mix</h2>
-    <div id="strategy-mix" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-
-    <h2 class="sec-h mt-7">Subdivide Tracker</h2>
-    <div id="subdivide-card"></div>
-
-    <h2 class="sec-h mt-7">Under Contract — Pipeline Health</h2>
-    <div class="card"><div id="uc-stages" class="overflow-x-auto"></div></div>
-
-    <h2 class="sec-h mt-7">Active Deals <span class="text-gray-400 normal-case font-normal tracking-normal">— from <code class="bg-gray-100 px-1 rounded">v_sales_pipeline</code></span></h2>
-    <div class="card"><div id="active-deals" class="overflow-x-auto"></div></div>
-
-    <h2 class="sec-h mt-7">Stale Deals — Needs Attention</h2>
-    <div class="card"><div id="stale-deals" class="overflow-x-auto"></div></div>
-  </section>
-
-  <!-- TEAM -->
-  <section data-section="team" hidden>
-    <h2 class="sec-h">Acquisition Manager — Jonathan</h2>
-    <div id="am-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-
-    <h2 class="sec-h mt-7">Disposition Manager — Jared</h2>
-    <div id="dispo-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-
-    <h2 class="sec-h mt-7">Lead Manager — Manny</h2>
-    <div class="text-xs text-gray-500 -mt-2 mb-2">Activity from JustCall · Outcomes from Pipedrive stage history</div>
-    <div id="lm-activity" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-    <div id="lm-outcomes" class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-3"></div>
-
-    <h2 class="sec-h mt-7">SMS — Tamar</h2>
-    <div id="sms-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-
-    <h2 class="sec-h mt-7">Cold Caller Team (Last 4 Weeks)</h2>
-    <div class="card"><div id="cc-table" class="overflow-x-auto"></div></div>
-  </section>
-
-  <!-- COSTS -->
-  <section data-section="costs" hidden>
-    <h2 class="sec-h">Monthly Cost Summary</h2>
-    <div id="costs-cards" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-7">
-      <div class="card"><h3 class="card-t">Monthly Burn by Channel</h3><canvas id="c-burn" height="140"></canvas></div>
-      <div class="card"><h3 class="card-t">ROAS by Channel (T3M)</h3><canvas id="c-roas" height="140"></canvas></div>
-    </div>
-    <h2 class="sec-h mt-7">Cost per X (Latest Trailing Avg)</h2>
-    <div class="card"><div id="cpx-table" class="overflow-x-auto"></div></div>
-  </section>
-
-  <!-- TRENDS -->
-  <section data-section="trends" hidden>
-    <h2 class="sec-h">Trends — 16 Weeks</h2>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="card"><h3 class="card-t">Conversion Funnel Over Time</h3><canvas id="c-tr-funnel" height="160"></canvas></div>
-      <div class="card"><h3 class="card-t">Qualification Rate</h3><canvas id="c-tr-qual" height="160"></canvas></div>
-      <div class="card"><h3 class="card-t">Cost per Lead / Qualified</h3><canvas id="c-tr-cost" height="160"></canvas></div>
-      <div class="card"><h3 class="card-t">Call Activity (Jonathan & Jared)</h3><canvas id="c-tr-calls" height="160"></canvas></div>
-    </div>
+  <section id="tab-trends" class="tab-pane">
+    <div class="section-title">12-Week CPL &amp; CPQ <span class="accent-line"></span></div>
+    <div class="card" style="height: 320px;"><canvas id="chart-cpl-trend"></canvas></div>
+    <div class="section-title" style="margin-top: 2rem;">Weekly Funnel Volume <span class="accent-line"></span></div>
+    <div class="card" style="height: 320px;"><canvas id="chart-funnel-trend"></canvas></div>
+    <div class="section-title" style="margin-top: 2rem;">Monthly Closed Deals &amp; Net Profit <span class="accent-line"></span></div>
+    <div class="card" style="height: 320px;"><canvas id="chart-closed-trend"></canvas></div>
+    <div class="section-title" style="margin-top: 2rem;">ROAS Trajectory <span class="accent-line"></span></div>
+    <div class="card" style="height: 320px;"><canvas id="chart-roas-trend"></canvas></div>
   </section>
 </main>
 
-<footer class="max-w-[80rem] mx-auto px-6 py-6 text-xs text-gray-400 text-center">
-  Live data from Supabase
-</footer>
+<div id="drill-overlay"></div>
+<aside id="drill-panel">
+  <div class="header">
+    <div>
+      <div id="drill-title" style="font-size: 1.05rem; font-weight: 600;">—</div>
+      <div id="drill-subtitle" class="mono" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">—</div>
+    </div>
+    <button class="close-btn" id="drill-close">×</button>
+  </div>
+  <div class="body" id="drill-body">
+    <div style="text-align: center; color: var(--text-dim); padding: 2rem;">Loading…</div>
+  </div>
+</aside>
 
-<script>
+<div id="picker-overlay">
+  <div id="picker-panel">
+    <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+      <div style="font-weight: 600;">Add metric to your view</div>
+      <button class="close-btn" id="picker-close">×</button>
+    </div>
+    <div style="padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border);">
+      <input type="text" id="picker-search" placeholder="Search metrics…" class="period-btn" style="width: 100%; padding: 0.5rem 0.75rem; font-family: 'IBM Plex Sans', sans-serif;" />
+    </div>
+    <div id="picker-list" style="flex: 1; overflow-y: auto; padding: 0.5rem 0;"></div>
+  </div>
+</div>
+
+<script id="app-script">
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
 const CONFIG = {
   SUPABASE_URL: 'https://bvmwlmeaurnqvfbtzvyp.supabase.co',
-  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2bXdsbWVhdXJucXZmYnR6dnlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NzczMzgsImV4cCI6MjA5MDA1MzMzOH0.gQVxi6EjtMnRrPdzrZM5YK6SWNQ4wQIK44PpZ2RILy0',
-  AUTO_REFRESH_MINUTES: 5
+  ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2bXdsbWVhdXJucXZmYnR6dnlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0NzczMzgsImV4cCI6MjA5MDA1MzMzOH0.gQVxi6EjtMnRrPdzrZM5YK6SWNQ4wQIK44PpZ2RILy0',
+  PIPEDRIVE_BASE: 'https://principalacres.pipedrive.com'
 };
 
-const state = { data:{}, filter:'this_week', tab:'overview', charts:{}, lastRefresh:null, autoTimer:null };
+const STATE = {
+  period: 'this_week',
+  periodStart: null,
+  periodEnd: null,
+  customRange: null,
+  activeTab: 'daily',
+  data: {},
+  targets: null,
+  presets: [],
+  currentPresetId: null,
+  customMetrics: [],
+  charts: {}
+};
 
-// ---------- Supabase fetch ----------
-async function sb(path){
-  const r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/${path}`, {
-    headers:{ apikey:CONFIG.SUPABASE_ANON_KEY, Authorization:`Bearer ${CONFIG.SUPABASE_ANON_KEY}` }
-  });
-  if(!r.ok) throw new Error(`${r.status} ${path}: ${await r.text()}`);
-  return r.json();
+// ═══════════════════════════════════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════════════════════════════════
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+const fmt = {
+  money: (v) => v == null || isNaN(v) ? '—' : '$' + Math.round(+v).toLocaleString(),
+  money2: (v) => v == null || isNaN(v) ? '—' : '$' + (+v).toFixed(2),
+  moneyK: (v) => {
+    if (v == null || isNaN(v)) return '—';
+    const n = +v;
+    if (Math.abs(n) >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
+    if (Math.abs(n) >= 1e3) return '$' + (n/1e3).toFixed(1) + 'k';
+    return '$' + Math.round(n);
+  },
+  num: (v) => v == null || isNaN(v) ? '—' : Math.round(+v).toLocaleString(),
+  num1: (v) => v == null || isNaN(v) ? '—' : (+v).toLocaleString(undefined, {maximumFractionDigits: 1}),
+  pct: (v, d = 1) => v == null || isNaN(v) ? '—' : (+v).toFixed(d) + '%',
+  ratio: (v) => v == null || isNaN(v) ? '—' : (+v).toFixed(1) + ':1',
+  hours: (v) => v == null || isNaN(v) ? '—' : (+v).toFixed(1) + 'h',
+  date: (d) => {
+    if (!d) return '—';
+    const x = new Date(d);
+    return (x.getMonth() + 1) + '/' + x.getDate();
+  },
+  dateLong: (d) => {
+    if (!d) return '—';
+    const x = new Date(d + (d.length <= 10 ? 'T12:00:00' : ''));
+    return x.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  },
+  dateFull: (d) => {
+    if (!d) return '—';
+    const x = new Date(d + (d.length <= 10 ? 'T12:00:00' : ''));
+    return x.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  },
+  dayName: (d) => {
+    if (!d) return '—';
+    const x = new Date(d + (d.length <= 10 ? 'T12:00:00' : ''));
+    return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][x.getDay()];
+  },
+  delta: (v, opts = {}) => {
+    if (v == null || isNaN(v)) return '<span class="delta delta-flat">—</span>';
+    const n = +v;
+    if (Math.abs(n) < 0.5) return `<span class="delta delta-flat">±0%</span>`;
+    const isGood = opts.lowerIsBetter ? n < 0 : n > 0;
+    const cls = isGood ? 'delta-up' : 'delta-down';
+    const arrow = n > 0 ? '▲' : '▼';
+    return `<span class="delta ${cls}">${arrow} ${Math.abs(n).toFixed(0)}%</span>`;
+  }
+};
+
+function ymd(d) {
+  if (typeof d === 'string') return d.slice(0, 10);
+  const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
-async function loadAll(){
-  const btn = document.getElementById('refresh-btn');
-  const lbl = document.getElementById('refresh-label');
-  btn.disabled = true; lbl.innerHTML = '<span class="spinner"></span>Loading';
-  document.getElementById('error-banner').hidden = true;
-  try {
-    const [kpi,snap,am,quo,lm,lmOut,sms,cc,dt,vsp,vsps,costs,cf,th,al,ph,stale,ccp] = await Promise.all([
-      sb('kpi_weekly_snapshot?order=week_start.asc'),
-      sb('pipedrive_daily_snapshot?order=snapshot_date.desc&limit=30'),
-      sb('v_am_weekly_scorecard?order=week_start.desc&limit=16'),
-      sb('v_quo_weekly?order=week_start.desc&limit=32'),
-      sb('v_lead_manager_weekly?order=week_start.desc&limit=16'),
-      sb('v_lead_manager_outcomes_weekly?order=week_start.desc&limit=32'),
-      sb('v_sms_weekly?order=week_start.desc&limit=16'),
-      sb('cold_caller_weekly?order=week_start.desc&limit=80'),
-      sb('deal_tracker?order=contract_date.desc.nullslast'),
-      sb('v_sales_pipeline?order=contract_date.desc.nullslast'),
-      sb('v_sales_pipeline_summary'),
-      sb('v_true_monthly_costs?order=month.desc&limit=12'),
-      sb('v_2026_channel_funnel'),
-      sb('kpi_thresholds'),
-      sb('v_active_listings'),
-      sb('v_active_pipeline_health'),
-      sb('v_stale_deals?limit=25'),
-      sb('v_cold_caller_performance')
-    ]);
-    state.data = { kpi, snap, am, quo, lm, lmOut, sms, cc, dt, vsp, vsps:(vsps[0]||{}), costs, channelFunnel:cf, thresholds:th, listings:al, pipelineHealth:ph, stale, ccPerf:ccp };
-    state.lastRefresh = new Date();
-    document.getElementById('last-refresh').textContent = `Updated ${state.lastRefresh.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
-    renderAll();
-  } catch(e){
-    const eb = document.getElementById('error-banner');
-    eb.textContent = e.message + '. Check that SUPABASE_ANON_KEY is set in the script block.';
-    eb.hidden = false;
-  } finally {
-    btn.disabled = false; lbl.textContent = 'Refresh';
-  }
+function daysBetween(start, end) {
+  const ms = 1000 * 60 * 60 * 24;
+  return Math.round((new Date(end + 'T00:00:00') - new Date(start + 'T00:00:00')) / ms) + 1;
 }
 
-// ---------- Date ranges ----------
-function getMonday(d){ const day=d.getDay(); const m=new Date(d); m.setDate(d.getDate()-(day===0?6:day-1)); m.setHours(0,0,0,0); return m; }
-function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
-function getRange(f){
-  const today = new Date(); today.setHours(23,59,59,999);
-  const monday = getMonday(today);
-  switch(f){
-    case 'this_week': return { start:monday, end:today, label:`This Week (since ${fmtD(monday)})` };
-    case 'last_week': return { start:addDays(monday,-7), end:addDays(monday,-1), label:`Last Week` };
-    case 'mtd': return { start:new Date(today.getFullYear(),today.getMonth(),1), end:today, label:`MTD (${today.toLocaleString('en-US',{month:'long'})})` };
-    case 'last_month': { const s=new Date(today.getFullYear(),today.getMonth()-1,1); const e=new Date(today.getFullYear(),today.getMonth(),0); e.setHours(23,59,59,999); return { start:s, end:e, label:`Last Month (${s.toLocaleString('en-US',{month:'long'})})` }; }
-    case 'ytd': return { start:new Date(today.getFullYear(),0,1), end:today, label:`YTD (${today.getFullYear()})` };
-    case 'projected': return { start:today, end:addDays(today,60), label:'Projected: next 60 days', projected:true };
-  }
-}
-
-function aggKpi(rows, range){
-  if(range.projected) return {};
-  let weeks = (rows||[]).filter(w=>{ const ws=new Date(w.week_start); const we=addDays(ws,6); return we>=range.start && ws<=range.end; });
-  if(weeks.length === 0 && rows && rows.length > 0){
-    const mostRecent = rows[rows.length-1];
-    if(mostRecent) weeks = [mostRecent];
-  }
-  const sum = k => weeks.reduce((s,w)=>s+(Number(w[k])||0),0);
-  const avg = k => { const v=weeks.map(w=>Number(w[k])).filter(x=>!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:null; };
-  const last = k => { for(let i=weeks.length-1;i>=0;i--){ const v=weeks[i][k]; if(v!=null) return Number(v); } return null; };
-  return {
-    weeks_count: weeks.length,
-    gross_leads_all: sum('gross_leads_all'),
-    gross_leads_cold_call: sum('gross_leads_cold_call'),
-    gross_leads_sms: sum('gross_leads_sms'),
-    gross_leads_direct_mail: sum('gross_leads_direct_mail'),
-    gross_leads_inbound: sum('gross_leads_inbound'),
-    qualified_leads_all: sum('qualified_leads_all'),
-    qualified_leads_cold_call: sum('qualified_leads_cold_call'),
-    qualified_leads_sms: sum('qualified_leads_sms'),
-    qualified_leads_direct_mail: sum('qualified_leads_direct_mail'),
-    offers_made: sum('offers_made'),
-    pas_sent: sum('pas_sent'),
-    deals_under_contract: sum('deals_under_contract'),
-    apns_purchased: sum('apns_purchased'),
-    canceled_contracts: sum('canceled_contracts'),
-    apns_sold: sum('apns_sold'),
-    property_sales: sum('property_sales'),
-    property_cost: sum('property_cost'),
-    gross_profit: sum('gross_profit'),
-    net_profit: sum('net_profit'),
-    expenses: sum('expenses'),
-    total_call_time_hours: sum('total_call_time_hours'),
-    outgoing_dials: sum('outgoing_dials'),
-    qualification_rate: avg('qualification_rate'),
-    contract_to_close_rate: avg('contract_to_close_rate'),
-    lead_to_uc_rate: avg('lead_to_uc_rate'),
-    cost_per_lead_t4w: last('cost_per_lead_t4w'),
-    cost_per_lead_cc_t4w: last('cost_per_lead_cc_t4w'),
-    cost_per_lead_sms_t4w: last('cost_per_lead_sms_t4w'),
-    cost_per_lead_dm_t4w: last('cost_per_lead_dm_t4w'),
-    cost_per_qualified_t4w: last('cost_per_qualified_t4w'),
-    cost_per_qualified_cc_t4w: last('cost_per_qualified_cc_t4w'),
-    cost_per_qualified_sms_t4w: last('cost_per_qualified_sms_t4w'),
-    cost_per_qualified_dm_t4w: last('cost_per_qualified_dm_t4w'),
-    cost_per_contract_t3m: last('cost_per_contract_t3m'),
-    cost_per_deal_t3m: last('cost_per_deal_t3m'),
-    roas_all_t3m: last('roas_all_t3m'),
-    roas_cc_t3m: last('roas_cc_t3m'),
-    roas_sms_t3m: last('roas_sms_t3m'),
-    roas_dm_t3m: last('roas_dm_t3m'),
-    apns_in_inventory: last('apns_in_inventory'),
-    cost_basis_inventory: last('cost_basis_inventory'),
-    book_value_inventory: last('book_value_inventory'),
-    gross_profit_pipeline: last('gross_profit_pipeline'),
-    projected_profit_close_60d: last('projected_profit_close_60d'),
-    avg_days_uc_to_close: avg('avg_days_uc_to_close'),
-    avg_days_on_market: avg('avg_days_on_market'),
-    avg_profit_per_deal: last('avg_profit_per_deal'),
-    net_profit_t4w_avg: last('net_profit_t4w_avg'),
-    land_acquired_total_cost: sum('land_acquired_total_cost'),
-    land_acquired_retail_value: sum('land_acquired_retail_value'),
-    estimated_retail_profit: sum('estimated_retail_profit')
+// ═══════════════════════════════════════════════════════════════
+// SUPABASE CLIENT
+// ═══════════════════════════════════════════════════════════════
+async function sb(path, opts = {}) {
+  const url = `${CONFIG.SUPABASE_URL}/rest/v1${path}`;
+  const headers = {
+    'apikey': CONFIG.ANON_KEY,
+    'Authorization': `Bearer ${CONFIG.ANON_KEY}`,
+    'Content-Type': 'application/json',
+    ...(opts.headers || {})
   };
+  const resp = await fetch(url, { ...opts, headers });
+  if (!resp.ok) {
+    const txt = await resp.text();
+    throw new Error(`Supabase ${resp.status}: ${txt.slice(0, 200)}`);
+  }
+  return await resp.json();
 }
 
-// ---------- Formatting ----------
-const fmtN = n => (n==null||isNaN(+n))?'—':Number(n).toLocaleString('en-US');
-const fmt1 = n => (n==null||isNaN(+n))?'—':Number(n).toLocaleString('en-US',{maximumFractionDigits:1});
-const fmt$ = n => { if(n==null||isNaN(+n))return'—'; const v=+n; if(Math.abs(v)>=1e6)return'$'+(v/1e6).toFixed(2)+'M'; if(Math.abs(v)>=1e4)return'$'+Math.round(v/1e3)+'k'; return '$'+Math.round(v).toLocaleString('en-US'); };
-const fmt$0 = n => (n==null||isNaN(+n))?'—':'$'+Math.round(Number(n)).toLocaleString('en-US');
-const fmtPct = n => (n==null||isNaN(+n))?'—':Number(n).toFixed(1)+'%';
-const fmtPctRaw = n => (n==null||isNaN(+n))?'—':Number(n).toFixed(0)+'%'; // for ROI/IRR coming as decimals or already %
-const fmtX = n => (n==null||isNaN(+n))?'—':Number(n).toFixed(1)+'x';
-const fmtD = d => !d?'—':((typeof d==='string')?new Date(d):d).toLocaleDateString('en-US',{month:'short',day:'numeric'});
-
-// ---------- Threshold pill ----------
-function pill(kpiName, value){
-  const t = state.data.thresholds?.find(x=>x.kpi_name===kpiName);
-  if(!t || value==null) return '';
-  const v=+value;
-  const inR = (min,max) => (min==null||v>=+min) && (max==null||v<=+max);
-  if(t.green_min!=null||t.green_max!=null) if(inR(t.green_min,t.green_max)) return '<span class="pill pill-g">GREEN</span>';
-  if(t.yellow_min!=null||t.yellow_max!=null) if(inR(t.yellow_min,t.yellow_max)) return '<span class="pill pill-y">YELLOW</span>';
-  if(t.red_min!=null||t.red_max!=null) if(inR(t.red_min,t.red_max)) return '<span class="pill pill-r">RED</span>';
-  return '';
+async function rpc(fn, body = {}) {
+  return sb(`/rpc/${fn}`, { method: 'POST', body: JSON.stringify(body) });
 }
 
-// Strategy pill class
-function strategyClass(s){
-  if(!s) return 'pill-strategy';
-  if(s.includes('Double')) return 'pill-strategy dc';
-  if(s.includes('Assignment')) return 'pill-strategy as';
-  if(s.includes('Subdivide')) return 'pill-strategy sd';
-  return 'pill-strategy';
+// ═══════════════════════════════════════════════════════════════
+// PERIOD CALCULATOR
+// ═══════════════════════════════════════════════════════════════
+function periodRange(name, custom = null) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const y = today.getFullYear(), m = today.getMonth(), d = today.getDate();
+  const dow = today.getDay();
+
+  const mk = (s, e, label) => ({ start: ymd(s), end: ymd(e), label });
+
+  switch (name) {
+    case 'this_week': {
+      const offset = dow === 0 ? -6 : 1 - dow;
+      return mk(new Date(y, m, d + offset), new Date(y, m, d + offset + 6), 'This Week');
+    }
+    case 'last_week': {
+      const offset = dow === 0 ? -13 : 1 - dow - 7;
+      return mk(new Date(y, m, d + offset), new Date(y, m, d + offset + 6), 'Last Week');
+    }
+    case 'mtd':         return mk(new Date(y, m, 1), today, 'MTD');
+    case 'last_month':  return mk(new Date(y, m - 1, 1), new Date(y, m, 0), 'Last Month');
+    case 'last_30':     return mk(new Date(y, m, d - 29), today, 'Last 30 days');
+    case 'last_90':     return mk(new Date(y, m, d - 89), today, 'Last 90 days');
+    case 'ytd':         return mk(new Date(y, 0, 1), today, 'YTD');
+    case 'custom':      return mk(new Date(custom.start + 'T12:00:00'), new Date(custom.end + 'T12:00:00'), 'Custom');
+  }
+  return mk(today, today, '?');
 }
 
-// ---------- KPI card ----------
-function card(label, value, sub='', threshKpi='', accent=false){
-  return `<div class="kpi-card${accent?' accent':''}">
-    <div class="kpi-label">${label}${threshKpi ? pill(threshKpi, value) : ''}</div>
-    <div class="kpi-value">${value}</div>
-    ${sub ? `<div class="kpi-sub">${sub}</div>` : ''}
+// ═══════════════════════════════════════════════════════════════
+// PILL RENDERER (from kpi_targets thresholds)
+// ═══════════════════════════════════════════════════════════════
+function scaledTarget(t, opts = {}) {
+  if (!t || t.target_value == null) return null;
+  let target = +t.target_value;
+  // Don't scale rates, percentages, or ratios
+  const isRate = ['percent', 'ratio'].includes(t.unit) || ['cost_per_lead','cost_per_qualified','cost_per_contract','cost_per_deal','q_rate_lm','quality_pct_cc','qualification_rate','lead_to_uc_rate','uc_to_close_rate','response_rate','deliverability_rate','roas_blended','response_time_seconds'].includes(t.metric_key);
+  if (isRate || opts.dontScale) return target;
+
+  if (t.period_type && STATE.periodStart && STATE.periodEnd) {
+    const days = daysBetween(STATE.periodStart, STATE.periodEnd);
+    if (t.period_type === 'daily')   target *= days;
+    else if (t.period_type === 'weekly')  target *= (days / 7);
+    else if (t.period_type === 'monthly') target *= (days / 30.4375);
+  }
+  return target;
+}
+
+function pillForMetric(metricKey, value, opts = {}) {
+  if (value == null || isNaN(value)) return '';
+  if (!STATE.targets) return '';
+  const t = STATE.targets.find(x => x.metric_key === metricKey);
+  if (!t || t.target_value == null) return '';
+
+  const target = scaledTarget(t, opts);
+  if (target == null) return '';
+
+  let level;
+  const v = +value;
+  if (t.direction === 'higher') {
+    if (v >= target) level = 'green';
+    else if (v >= target * 0.8) level = 'amber';
+    else level = 'red';
+  } else {
+    if (v <= target) level = 'green';
+    else if (v <= target * 1.2) level = 'amber';
+    else level = 'red';
+  }
+
+  const goalDisplay = formatByUnit(t.unit, target);
+  const arrow = t.direction === 'higher' ? '↑' : '↓';
+  return `<span class="pill pill-${level}" title="${t.display_name || t.metric_key} • Goal ${arrow}${goalDisplay} (${t.period_type})">${arrow}${goalDisplay}</span>`;
+}
+
+function getTarget(metricKey) {
+  return STATE.targets?.find(x => x.metric_key === metricKey) || null;
+}
+
+function formatByUnit(unit, value) {
+  if (unit === 'dollars') return fmt.money(value);
+  if (unit === 'percent') return fmt.pct(value, 1);
+  if (unit === 'hours') return fmt.hours(value);
+  return fmt.num(value);
+}
+
+function goalBar(metricKey, value) {
+  const t = getTarget(metricKey);
+  if (!t || t.target_value == null || value == null) return '';
+  const target = scaledTarget(t);
+  if (target == null) return '';
+  const v = +value;
+  let pct, level;
+  if (t.direction === 'higher') {
+    pct = Math.min(100, (v / target) * 100);
+    if (v >= target) level = 'green';
+    else if (v >= target * 0.8) level = 'amber';
+    else level = 'red';
+  } else {
+    pct = Math.min(100, Math.max(0, 100 - ((v - target) / target) * 100));
+    if (v <= target) level = 'green';
+    else if (v <= target * 1.2) level = 'amber';
+    else level = 'red';
+  }
+  return `<div class="goal-bar"><div class="goal-bar-fill ${level}" style="width:${pct}%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text-dim);margin-top:2px;font-family:'JetBrains Mono',monospace;">
+      <span>${formatByUnit(t.unit, v)}</span><span>Goal ${formatByUnit(t.unit, target)}</span>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CARD HELPER
+// ═══════════════════════════════════════════════════════════════
+function statCard({ label, value, sub, pill, clickable = false, onclick = '', extra = '' }) {
+  return `<div class="card ${clickable ? 'card-clickable' : ''}" ${onclick ? `onclick="${onclick}"` : ''}>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
+      <span class="label">${label}</span>
+      ${pill || ''}
+    </div>
+    <div class="stat-num">${value}</div>
+    ${sub ? `<div class="stat-sub">${sub}</div>` : ''}
+    ${extra}
   </div>`;
 }
 
-// ---------- Chart helpers ----------
-function chart(id, type, data, opts={}){
-  if(state.charts[id]) state.charts[id].destroy();
-  const ctx = document.getElementById(id);
-  if(!ctx) return;
-  state.charts[id] = new Chart(ctx, { type, data, options:{
-    responsive:true, maintainAspectRatio:true,
-    plugins:{ legend:{ position:'bottom', labels:{ font:{size:11}, padding:14, boxWidth:10 }}},
-    scales: type==='doughnut' ? {} : { x:{ grid:{display:false}, ticks:{font:{size:10}}}, y:{ grid:{color:'#f3f4f6'}, ticks:{font:{size:10}}}},
-    ...opts
-  }});
+// ═══════════════════════════════════════════════════════════════
+// DRILL-DOWN
+// ═══════════════════════════════════════════════════════════════
+async function drillDown({ segment, channel, label }) {
+  $('#drill-title').textContent = label;
+  $('#drill-subtitle').textContent = `${fmt.dateLong(STATE.periodStart)} → ${fmt.dateLong(STATE.periodEnd)}${channel ? ' • ' + channel : ''}`;
+  $('#drill-overlay').classList.add('open');
+  $('#drill-panel').classList.add('open');
+  $('#drill-body').innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:3rem;"><div class="spinner" style="margin:0 auto 0.75rem;"></div>Loading records…</div>';
+
+  try {
+    const records = await rpc('get_period_funnel_records', {
+      p_start: STATE.periodStart,
+      p_end: STATE.periodEnd,
+      p_segment: segment,
+      p_channel: channel || null
+    });
+    renderDrillRecords(records, label);
+  } catch (e) {
+    $('#drill-body').innerHTML = `<div class="err-banner">Failed to load: ${e.message}</div>`;
+  }
 }
 
-// ---------- RENDERERS ----------
-function renderAll(){
-  const range = getRange(state.filter);
-  document.getElementById('period-label').textContent = range.label;
-  renderOverview(range);
-  renderLeads(range);
-  renderPipeline(range);
-  renderTeam(range);
-  renderCosts(range);
-  renderTrends();
+function renderDrillRecords(records, label) {
+  if (!records || records.length === 0) {
+    $('#drill-body').innerHTML = '<div style="text-align:center;color:var(--text-dim);padding:3rem;">No records in this period.</div>';
+    $('#drill-subtitle').textContent += ' • 0 records';
+    return;
+  }
+  $('#drill-subtitle').textContent += ` • ${records.length} records`;
+
+  const rows = records.map(r => {
+    const pdLink = r.pipedrive_deal_id ? `${CONFIG.PIPEDRIVE_BASE}/deal/${r.pipedrive_deal_id}` : null;
+    const dealCell = pdLink
+      ? `<a href="${pdLink}" target="_blank">${r.deal_title || '(untitled)'}</a>`
+      : (r.deal_title || '—');
+    const loc = [r.county, r.state].filter(Boolean).join(', ') || '—';
+    return `<tr>
+      <td>${dealCell}</td>
+      <td>${r.lead_source || '—'}</td>
+      <td>${loc}</td>
+      <td class="num">${r.acreage || '—'}</td>
+      <td class="num">${r.purchase_price ? fmt.money(r.purchase_price) : '—'}</td>
+      <td class="num" style="color:var(--text-muted);font-size:0.75rem;">${fmt.dateLong(r.event_at)}</td>
+    </tr>`;
+  }).join('');
+
+  $('#drill-body').innerHTML = `<table class="data-table">
+    <thead><tr><th>Deal</th><th>Source</th><th>Location</th><th>Acres</th><th>Price</th><th>Date</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
 }
 
-function renderOverview(range){
-  const a = aggKpi(state.data.kpi, range);
-  const s = state.data.vsps || {};
-
-  document.getElementById('ov-activity').innerHTML = [
-    card('Active UC Deals', fmtN(s.active_deals), 'currently in pipeline'),
-    card('Pipeline Cost Basis', fmt$(s.total_purchase_price), 'sum of purchase prices'),
-    card('New Leads', fmtN(a.gross_leads_all), `${a.weeks_count||0} weeks`),
-    card('Deals UC (period)', fmtN(a.deals_under_contract), `${fmtN(a.canceled_contracts)} terminated`, 'deals_under_contract'),
-    card('Qualified Leads', fmtN(a.qualified_leads_all), '', 'qualified_leads_all'),
-    card('Offers Made', fmtN(a.offers_made), '', 'offers_made'),
-    card('PAs Sent', fmtN(a.pas_sent)),
-    card('APNs Acquired', fmtN(a.apns_purchased), 'this period')
-  ].join('');
-
-  document.getElementById('ov-conversion').innerHTML = [
-    card('Qualification Rate', fmtPct(a.qualification_rate), 'leads → qualified', 'qualification_rate'),
-    card('Lead → UC Rate', fmtPct(a.lead_to_uc_rate), 'YTD'),
-    card('UC → Close Rate', fmtPct(a.contract_to_close_rate), 'YTD'),
-    card('Avg Days UC → Close', fmt1(a.avg_days_uc_to_close), 'velocity', 'avg_days_uc_to_close'),
-    card('Cost / Lead (T4W)', fmt$0(a.cost_per_lead_t4w), 'all channels', 'cost_per_lead_all'),
-    card('Cost / Qualified (T4W)', fmt$0(a.cost_per_qualified_t4w), 'all channels', 'cost_per_qualified_all'),
-    card('Cost / Contract (T3M)', fmt$0(a.cost_per_contract_t3m), 'blended'),
-    card('Cost / Deal (T3M)', fmt$0(a.cost_per_deal_t3m), 'closed deals')
-  ].join('');
-
-  document.getElementById('ov-financials').innerHTML = [
-    card('Quick Profit (Pipeline)', fmt$(s.total_quick_profit_estimate), 'rough early estimate', '', true),
-    card('Projected Profit', fmt$(s.total_projected_profit), 'listing-based', '', true),
-    card('Estimated PA Net', fmt$(s.total_estimated_pa_net), 'after splits & costs', '', true),
-    card('Avg Deal ROI', fmtPctRaw(s.avg_roi_pct), 'on PA capital'),
-    card('Avg Deal IRR', fmtPctRaw(s.avg_irr_pct), 'annualized'),
-    card('Inventory (cost basis)', fmt$(a.cost_basis_inventory), `${fmtN(a.apns_in_inventory)} APNs`),
-    card('Closed Revenue', fmt$(a.property_sales), `${fmtN(a.apns_sold)} sold`),
-    card('Net Profit', fmt$(a.net_profit), 'period')
-  ].join('');
-
-  // Funnel chart (16 weeks)
-  const k = state.data.kpi || [];
-  chart('c-funnel','line',{
-    labels: k.map(w=>fmtD(w.week_start)),
-    datasets: [
-      { label:'Leads', data:k.map(w=>+w.gross_leads_all||0), borderColor:'#3b82f6', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'Qualified', data:k.map(w=>+w.qualified_leads_all||0), borderColor:'#10b981', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'Offers', data:k.map(w=>+w.offers_made||0), borderColor:'#f59e0b', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'UC', data:k.map(w=>+w.deals_under_contract||0), borderColor:'#ef4444', backgroundColor:'transparent', tension:.3, pointRadius:2 }
-    ]
-  });
-
-  chart('c-mix','doughnut',{
-    labels: ['Cold Call','SMS','Direct Mail','Inbound'],
-    datasets: [{
-      data: [a.gross_leads_cold_call||0, a.gross_leads_sms||0, a.gross_leads_direct_mail||0, a.gross_leads_inbound||0],
-      backgroundColor: ['#3b82f6','#8b5cf6','#f59e0b','#10b981'], borderWidth:0
-    }]
-  });
+function closeDrill() {
+  $('#drill-overlay').classList.remove('open');
+  $('#drill-panel').classList.remove('open');
 }
 
-function renderLeads(range){
-  const a = aggKpi(state.data.kpi, range);
-  const channelHTML = (name, leads, qual, cpl, cpq, qPct) => `
-    <div class="kpi-card">
-      <div class="kpi-label">${name}</div>
-      <div class="kpi-value">${fmtN(leads)}</div>
-      <div class="kpi-sub">${fmtN(qual)} qualified · ${fmtPct(qPct)}</div>
-      <div class="kpi-sub mt-2">CPL: ${fmt$0(cpl)} · CPQ: ${fmt$0(cpq)}</div>
+// ═══════════════════════════════════════════════════════════════
+// LOADERS (cached per period)
+// ═══════════════════════════════════════════════════════════════
+async function getPeriodMetrics() {
+  if (!STATE.data.metrics) {
+    STATE.data.metrics = await rpc('get_period_metrics', {
+      p_start: STATE.periodStart, p_end: STATE.periodEnd
+    });
+  }
+  return STATE.data.metrics;
+}
+
+async function getDailyPulse(days = 7) {
+  const k = `daily_${days}`;
+  if (!STATE.data[k]) {
+    const d = new Date(); d.setDate(d.getDate() - days);
+    STATE.data[k] = await sb(`/v_daily_pulse?date=gte.${ymd(d)}&order=date.desc`);
+  }
+  return STATE.data[k];
+}
+
+async function getColdCallers() {
+  if (!STATE.data.cc) {
+    STATE.data.cc = await sb('/v_cold_caller_recent?week_rank=lte.4&order=week_start.desc,caller_name.asc');
+  }
+  return STATE.data.cc;
+}
+
+async function getMannyDaily(days = 14) {
+  if (!STATE.data.manny) {
+    const d = new Date(); d.setDate(d.getDate() - days);
+    STATE.data.manny = await sb(`/v_lead_manager_daily?date=gte.${ymd(d)}&agent_name=eq.Manny%20Cubias&order=date.desc`);
+  }
+  return STATE.data.manny;
+}
+
+async function getAgentDaily(name, days = 14) {
+  const k = `agent_${name}_${days}`;
+  if (!STATE.data[k]) {
+    const d = new Date(); d.setDate(d.getDate() - days);
+    STATE.data[k] = await sb(`/v_lead_manager_daily?date=gte.${ymd(d)}&agent_name=eq.${encodeURIComponent(name)}&order=date.desc`);
+  }
+  return STATE.data[k];
+}
+
+async function getPipelineSummary() {
+  if (!STATE.data.pipeline_summary) {
+    const r = await sb('/v_sales_pipeline_summary?select=*&limit=1');
+    STATE.data.pipeline_summary = r[0] || null;
+  }
+  return STATE.data.pipeline_summary;
+}
+
+async function getPipelineActive() {
+  if (!STATE.data.pipeline_active) {
+    STATE.data.pipeline_active = await sb('/v_active_pipeline_health?order=pipeline_name.asc,stage_name.asc');
+  }
+  return STATE.data.pipeline_active;
+}
+
+async function getStaleDeals() {
+  if (!STATE.data.stale) {
+    STATE.data.stale = await sb('/v_stale_deals?order=days_since_update.desc');
+  }
+  return STATE.data.stale;
+}
+
+async function getActiveDeals() {
+  if (!STATE.data.active_deals) {
+    STATE.data.active_deals = await sb('/v_sales_pipeline?is_active=eq.true&order=contract_date.desc');
+  }
+  return STATE.data.active_deals;
+}
+
+async function getClosedDealsInPeriod() {
+  const k = `closed_${STATE.periodStart}_${STATE.periodEnd}`;
+  if (!STATE.data[k]) {
+    STATE.data[k] = await sb(`/v_sales_pipeline?actual_close_date=gte.${STATE.periodStart}&actual_close_date=lte.${STATE.periodEnd}&order=actual_close_date.desc`);
+  }
+  return STATE.data[k];
+}
+
+async function getKpiSnapshots(weeks = 12) {
+  if (!STATE.data.snapshots) {
+    STATE.data.snapshots = await sb(`/kpi_weekly_snapshot?order=week_start.desc&limit=${weeks}`);
+  }
+  return STATE.data.snapshots;
+}
+
+async function getMonthlyCosts() {
+  if (!STATE.data.monthly_costs) {
+    STATE.data.monthly_costs = await sb('/v_true_monthly_costs?order=month.desc&limit=12');
+  }
+  return STATE.data.monthly_costs;
+}
+
+async function getPipedriveSnapshots(days = 30) {
+  if (!STATE.data.pd_snapshots) {
+    const d = new Date(); d.setDate(d.getDate() - days);
+    STATE.data.pd_snapshots = await sb(`/pipedrive_daily_snapshot?snapshot_date=gte.${ymd(d)}&order=snapshot_date.desc`);
+  }
+  return STATE.data.pd_snapshots;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: DAILY PULSE
+// ═══════════════════════════════════════════════════════════════
+async function renderDailyTab() {
+  const days = await getDailyPulse(7);
+  if (!days || days.length === 0) {
+    $('#daily-yesterday').innerHTML = '<div class="err-banner" style="grid-column: 1/-1;">No daily data available</div>';
+    return;
+  }
+  const yesterday = days[0];
+  $('#daily-window').textContent = `Latest: ${fmt.dateFull(yesterday.date)} (${yesterday.day_name})`;
+
+  const cards = [
+    statCard({ label: 'New Leads', value: fmt.num(yesterday.new_leads_total), sub: `CC ${fmt.num(yesterday.new_leads_cold_call)} · SMS ${fmt.num(yesterday.new_leads_sms)} · DM ${fmt.num(yesterday.new_leads_direct_mail)} · In ${fmt.num(yesterday.new_leads_inbound)}`, pill: pillForMetric('gross_leads_all', yesterday.new_leads_total) }),
+    statCard({ label: 'Qualified', value: fmt.num(yesterday.new_qualified_total), sub: `CC ${fmt.num(yesterday.new_qualified_cold_call)} · SMS ${fmt.num(yesterday.new_qualified_sms)}`, pill: pillForMetric('qualifications_made', yesterday.new_qualified_total) }),
+    statCard({ label: 'Offers Made', value: fmt.num(yesterday.new_offers_made), sub: 'Verbal + SMS offers', pill: pillForMetric('offers_made', yesterday.new_offers_made) }),
+    statCard({ label: 'New UC', value: fmt.num(yesterday.new_under_contract), sub: 'Deals into UC' }),
+    statCard({ label: 'Texts Sent', value: fmt.num(yesterday.sms_texts_sent), sub: `Resp rate ${fmt.pct(yesterday.sms_response_rate)}`, pill: pillForMetric('texts_sent', yesterday.sms_texts_sent) }),
+    statCard({ label: 'Manny Calls', value: fmt.num(yesterday.manny_calls), sub: `${fmt.hours(yesterday.manny_talk_hours)} talk · ${fmt.num(yesterday.manny_texts)} texts`, pill: pillForMetric('total_dials_lm', yesterday.manny_calls) }),
+    statCard({ label: 'Jonathan Activity', value: fmt.num(yesterday.jonathan_calls), sub: `${fmt.hours(yesterday.jonathan_talk_hours)} talk · ${fmt.num(yesterday.jonathan_texts)} texts` }),
+    statCard({ label: 'Jared Activity', value: fmt.num(yesterday.jared_calls), sub: `${fmt.hours(yesterday.jared_talk_hours)} talk · ${fmt.num(yesterday.jared_texts)} texts` })
+  ].join('');
+  $('#daily-yesterday').innerHTML = cards;
+
+  // 7-day table
+  const headers = ['Date', 'Day', 'Texts', 'Leads', 'Qual', 'Offers', 'UC', 'Manny Calls', 'JN Calls', 'JR Calls'];
+  const rows = days.map(d => `<tr>
+    <td>${fmt.dateLong(d.date)}</td>
+    <td style="color:var(--text-muted);">${d.day_name}</td>
+    <td class="num">${fmt.num(d.sms_texts_sent)}</td>
+    <td class="num">${fmt.num(d.new_leads_total)}</td>
+    <td class="num">${fmt.num(d.new_qualified_total)}</td>
+    <td class="num">${fmt.num(d.new_offers_made)}</td>
+    <td class="num">${fmt.num(d.new_under_contract)}</td>
+    <td class="num">${fmt.num(d.manny_calls)}</td>
+    <td class="num">${fmt.num(d.jonathan_calls)}</td>
+    <td class="num">${fmt.num(d.jared_calls)}</td>
+  </tr>`).join('');
+  $('#daily-table-wrap').innerHTML = `<table class="data-table"><thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>`;
+
+  // Pipeline state (current snapshot)
+  $('#daily-pipeline-state').innerHTML = [
+    statCard({ label: 'Active Leads', value: fmt.num(yesterday.active_leads_total) }),
+    statCard({ label: 'Active Qualified', value: fmt.num(yesterday.active_qualified_total) }),
+    statCard({ label: 'Inventory Held', value: fmt.num(yesterday.inventory_held) }),
+    statCard({ label: 'In Due Diligence', value: fmt.num(yesterday.deals_in_dd) }),
+    statCard({ label: 'Listed', value: fmt.num(yesterday.deals_listed) }),
+    statCard({ label: 'With Title', value: fmt.num(yesterday.deals_with_title) }),
+    statCard({ label: 'Scheduled Close', value: fmt.num(yesterday.deals_scheduled_close) }),
+    statCard({ label: 'Pipeline Value', value: fmt.moneyK(yesterday.total_pipeline_value), sub: `Projected profit ${fmt.moneyK(yesterday.projected_profit)}` })
+  ].join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: WEEKLY SCORECARD
+// ═══════════════════════════════════════════════════════════════
+async function renderScorecardTab() {
+  const metrics = await getPeriodMetrics();
+  const days = await getDailyPulse(Math.max(7, daysBetween(STATE.periodStart, STATE.periodEnd) + 1));
+
+  // Filter days to period
+  const periodDays = days.filter(d => d.date >= STATE.periodStart && d.date <= STATE.periodEnd);
+  $('#scorecard-window').textContent = `${fmt.dateLong(STATE.periodStart)} → ${fmt.dateLong(STATE.periodEnd)} (${periodDays.length} days)`;
+
+  // Sum daily metrics for the period
+  const sum = (arr, key) => arr.reduce((a, x) => a + (+x[key] || 0), 0);
+  const avg = (arr, key) => arr.length ? sum(arr, key) / arr.length : 0;
+
+  const tamarTexts = sum(periodDays, 'sms_texts_sent');
+  const tamarTextsPerDay = avg(periodDays, 'sms_texts_sent');
+  const tamarLeads = sum(periodDays, 'new_leads_sms');
+
+  const mannyCalls = sum(periodDays, 'manny_calls');
+  const mannyTalk = sum(periodDays, 'manny_talk_hours');
+
+  const jonathanCalls = sum(periodDays, 'jonathan_calls');
+  const jonathanTalk = sum(periodDays, 'jonathan_talk_hours');
+
+  const offers = metrics.funnel.offers_made;
+  const ucs = metrics.funnel.uc_new;
+  const closed = metrics.funnel.closed;
+
+  const sections = [];
+
+  // Tamar
+  sections.push(scoreSection('Tamar — Texter (SMS)', [
+    scoreRow('Texts Sent', tamarTexts, 'texts_sent', { sub: `${fmt.num(tamarTextsPerDay)}/day avg` }),
+    scoreRow('Leads from SMS', tamarLeads, 'leads_to_crm'),
+    scoreRow('SMS → Lead Rate', tamarTexts ? (tamarLeads / tamarTexts * 1000) : 0, 'leads_per_1k_texts', { format: 'num1', suffix: ' / 1k' })
+  ]));
+
+  // MaryJane via cold callers
+  const cc = await getColdCallers();
+  const ccCurrent = cc.filter(x => x.week_rank === 1);
+  const mjRow = ccCurrent.find(x => x.caller_name?.toLowerCase() === 'maryjane');
+  const ccTotalLeads = ccCurrent.reduce((a, x) => a + (+x.total_leads || 0), 0);
+  const ccTotalCalls = ccCurrent.reduce((a, x) => a + (+x.total_calls || 0), 0);
+  const ccTotalQual = ccCurrent.reduce((a, x) => a + (+x.qualified || 0), 0);
+
+  sections.push(scoreSection(`Cold Calling Team (Mon–Sat)${ccCurrent[0] ? ` <span class="data-window">Week of ${fmt.dateLong(ccCurrent[0].week_start)}</span>` : ''}`, [
+    scoreRow('Total Calls (Team)', ccTotalCalls, 'total_dials_cc'),
+    scoreRow('Total Leads (Team)', ccTotalLeads, 'leads_to_crm_cc'),
+    scoreRow('Total Qualified (Team)', ccTotalQual, 'qualified_leads_cc'),
+    scoreRow('MaryJane Leads', mjRow?.total_leads || 0, 'maryjane_leads_weekly')
+  ]));
+
+  // Manny
+  sections.push(scoreSection('Manny — Lead Manager', [
+    scoreRow('Outbound Calls', mannyCalls, 'total_dials_lm'),
+    scoreRow('Talk Hours', mannyTalk, 'talk_time_hours_lm', { format: 'hours' }),
+    scoreRow('Qualified Leads (All)', metrics.funnel.qualified_total, 'qualifications_made'),
+    scoreRow('Lead → Qualified %', metrics.funnel.lead_to_qual_pct, 'qualification_rate', { format: 'pct', suffix: ` (${fmt.ratio(metrics.funnel.lead_to_qual_ratio)})` })
+  ]));
+
+  // Jonathan (AM)
+  sections.push(scoreSection('Jonathan — Acquisition Manager', [
+    scoreRow('Calls', jonathanCalls, 'jonathan_calls_period'),
+    scoreRow('Talk Hours', jonathanTalk, 'talk_time_hours_am', { format: 'hours' }),
+    scoreRow('Offers Made', offers, 'offers_made'),
+    scoreRow('Deals to UC', ucs, 'contracts_signed'),
+    scoreRow('Qualified → Offer %', metrics.funnel.qual_to_offer_pct, 'qual_to_offer_pct_period', { format: 'pct', suffix: ` (${fmt.ratio(metrics.funnel.qual_to_offer_ratio)})` }),
+    scoreRow('Offer → UC %', metrics.funnel.offer_to_uc_pct, 'offer_to_uc_pct_period', { format: 'pct', suffix: ` (${fmt.ratio(metrics.funnel.offer_to_uc_ratio)})` })
+  ]));
+
+  // Jared (Dispo)
+  sections.push(scoreSection('Jared — Disposition', [
+    scoreRow('Closed Deals', closed, 'deals_closed_dispo'),
+    scoreRow('Closed Net Profit', metrics.closed.closed_net, 'net_profit', { format: 'money' }),
+    scoreRow('Closed Revenue', metrics.closed.closed_revenue, 'closed_revenue_period', { format: 'money' })
+  ]));
+
+  $('#scorecard-container').innerHTML = sections.join('');
+}
+
+function scoreSection(title, rows) {
+  return `<div class="card" style="padding: 0;">
+    <div style="padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem;">
+      <div style="font-weight: 600; font-size: 0.95rem;">${title}</div>
+    </div>
+    <div style="padding: 0.5rem 1rem;">
+      ${rows.map(r => r).join('')}
+    </div>
+  </div>`;
+}
+
+function scoreRow(label, value, metricKey, opts = {}) {
+  const t = getTarget(metricKey);
+  const fmtFn = {
+    money: fmt.money, pct: fmt.pct, hours: fmt.hours, num1: fmt.num1, num: fmt.num
+  }[opts.format || 'num'];
+  const valDisplay = fmtFn(value) + (opts.suffix || '');
+  let pillHtml = '', barHtml = '';
+  if (t && t.target_value != null) {
+    pillHtml = pillForMetric(metricKey, value);
+    barHtml = `<div style="flex: 0 0 200px;">${goalBar(metricKey, value)}</div>`;
+  }
+  return `<div style="display:flex;align-items:center;gap:1rem;padding:0.5rem 0;border-bottom:1px solid var(--border);">
+    <div style="flex:1;font-size:0.85rem;">${label}${opts.sub ? `<div style="font-size:0.7rem;color:var(--text-muted);">${opts.sub}</div>` : ''}</div>
+    <div class="num" style="font-size:0.95rem;font-weight:500;min-width:120px;text-align:right;">${valDisplay}</div>
+    ${pillHtml ? `<div style="min-width:100px;text-align:right;">${pillHtml}</div>` : '<div style="min-width:100px;"></div>'}
+    ${barHtml || '<div style="flex:0 0 200px;"></div>'}
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: LEAD GENERATION
+// ═══════════════════════════════════════════════════════════════
+async function renderLeadsTab() {
+  const m = await getPeriodMetrics();
+  renderFunnelBlock(m);
+  renderCostCards(m);
+  renderChannelCards(m);
+}
+
+function renderFunnelBlock(m) {
+  const f = m.funnel;
+  const stages = [
+    { label: 'Leads',      val: f.leads_total,    seg: 'leads',       sub: `CC ${f.leads_cold_call} · SMS ${f.leads_sms} · DM ${f.leads_direct_mail} · In ${f.leads_inbound}` },
+    { label: 'Qualified',  val: f.qualified_total, seg: 'qualified',   sub: `CC ${f.qualified_cold_call} · SMS ${f.qualified_sms}` },
+    { label: 'Offers',     val: f.offers_made,    seg: 'offers',      sub: 'Verbal + SMS offers' },
+    { label: 'Under Contract', val: f.uc_new,    seg: 'uc',          sub: 'New UC entries' },
+    { label: 'Closed',     val: f.closed,         seg: 'closed',      sub: 'Buy-side closes' }
+  ];
+  const conversions = [
+    { from: 'Lead → Qualified', pct: f.lead_to_qual_pct, ratio: f.lead_to_qual_ratio },
+    { from: 'Qualified → Offer', pct: f.qual_to_offer_pct, ratio: f.qual_to_offer_ratio },
+    { from: 'Offer → UC', pct: f.offer_to_uc_pct, ratio: f.offer_to_uc_ratio },
+    { from: 'UC → Closed', pct: f.uc_to_close_pct, ratio: f.uc_to_close_ratio }
+  ];
+
+  let html = '<div style="display:grid;grid-template-columns:repeat(5,1fr) auto;gap:0.5rem;align-items:stretch;">';
+  stages.forEach((s, i) => {
+    html += `<div class="funnel-stage" onclick="drillDown({segment:'${s.seg}',label:'${s.label}'})">
+      <div class="label">${s.label}</div>
+      <div class="stat-num" style="margin-top:0.4rem;">${fmt.num(s.val)}</div>
+      <div class="stat-sub" style="font-size:0.7rem;">${s.sub}</div>
     </div>`;
-  document.getElementById('ch-cards').innerHTML = [
-    channelHTML('Cold Call', a.gross_leads_cold_call, a.qualified_leads_cold_call, a.cost_per_lead_cc_t4w, a.cost_per_qualified_cc_t4w, a.gross_leads_cold_call ? a.qualified_leads_cold_call/a.gross_leads_cold_call*100 : null),
-    channelHTML('SMS', a.gross_leads_sms, a.qualified_leads_sms, a.cost_per_lead_sms_t4w, a.cost_per_qualified_sms_t4w, a.gross_leads_sms ? a.qualified_leads_sms/a.gross_leads_sms*100 : null),
-    channelHTML('Direct Mail', a.gross_leads_direct_mail, a.qualified_leads_direct_mail, a.cost_per_lead_dm_t4w, a.cost_per_qualified_dm_t4w, a.gross_leads_direct_mail ? a.qualified_leads_direct_mail/a.gross_leads_direct_mail*100 : null),
-    channelHTML('Inbound', a.gross_leads_inbound, '—', '—', '—', null)
-  ].join('');
-
-  const k = state.data.kpi || [];
-  chart('c-leads-channel','bar',{
-    labels: k.map(w=>fmtD(w.week_start)),
-    datasets: [
-      { label:'Cold Call', data:k.map(w=>+w.gross_leads_cold_call||0), backgroundColor:'#3b82f6' },
-      { label:'SMS', data:k.map(w=>+w.gross_leads_sms||0), backgroundColor:'#8b5cf6' },
-      { label:'Direct Mail', data:k.map(w=>+w.gross_leads_direct_mail||0), backgroundColor:'#f59e0b' },
-      { label:'Inbound', data:k.map(w=>+w.gross_leads_inbound||0), backgroundColor:'#10b981' }
-    ]
-  },{ scales:{ x:{ stacked:true, grid:{display:false}, ticks:{font:{size:10}}}, y:{ stacked:true, grid:{color:'#f3f4f6'}, ticks:{font:{size:10}}}}});
-
-  chart('c-cpl','line',{
-    labels: k.map(w=>fmtD(w.week_start)),
-    datasets: [
-      { label:'CC', data:k.map(w=>+w.cost_per_lead_cc_t4w||null), borderColor:'#3b82f6', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'SMS', data:k.map(w=>+w.cost_per_lead_sms_t4w||null), borderColor:'#8b5cf6', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'All', data:k.map(w=>+w.cost_per_lead_t4w||null), borderColor:'#111827', backgroundColor:'transparent', tension:.3, pointRadius:2, borderDash:[5,3] }
-    ]
+    if (i < stages.length - 1) {
+      const c = conversions[i];
+      html += `<div class="funnel-arrow" style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:0 0.25rem;">
+        <div style="color:var(--text-dim);font-size:1.4rem;">›</div>
+        <div class="pct">${fmt.pct(c.pct, 1)}</div>
+        <div class="ratio">${fmt.ratio(c.ratio)}</div>
+      </div>`;
+    }
   });
+  html += `<div class="funnel-stage" style="background:rgba(248,113,113,0.05);border-color:rgba(248,113,113,0.2);cursor:pointer;" onclick="drillDown({segment:'terminated',label:'Terminated'})">
+    <div class="label" style="color:var(--red);">Terminated</div>
+    <div class="stat-num" style="margin-top:0.4rem;color:var(--red);">${fmt.num(f.terminated)}</div>
+    <div class="stat-sub" style="font-size:0.7rem;">Canceled UCs</div>
+  </div>`;
+  html += '</div>';
 
-  const cf = state.data.channelFunnel || [];
-  document.getElementById('ch-funnel-table').innerHTML = `
-    <table class="dt"><thead><tr>
-      <th>Channel</th><th class="num">Total Deals</th><th class="num">Active Leads</th><th class="num">Disqualified</th>
-      <th class="num">Qualified</th><th class="num">Offers</th><th class="num">UC</th><th class="num">Inventory</th><th class="num">Closed Won</th><th class="num">Terminated</th>
-      <th class="num">L→Q %</th><th class="num">Q→UC %</th>
-    </tr></thead><tbody>
-    ${cf.map(r=>`<tr>
-      <td><b>${r.channel}</b></td><td class="num">${fmtN(r.total_deals)}</td><td class="num">${fmtN(r.active_leads)}</td>
-      <td class="num">${fmtN(r.disqualified_leads)}</td><td class="num">${fmtN(r.qualified_total)}</td>
-      <td class="num">${fmtN(r.offers_made)}</td><td class="num">${fmtN(r.active_under_contract)}</td>
-      <td class="num">${fmtN(r.inventory_held)}</td><td class="num">${fmtN(r.closed_won)}</td><td class="num">${fmtN(r.terminated)}</td>
-      <td class="num">${fmtPct(r.lead_to_qualified_pct)}</td><td class="num">${fmtPct(r.qualified_to_uc_pct)}</td>
-    </tr>`).join('')}
-    </tbody></table>`;
+  $('#funnel-block').innerHTML = html;
 }
 
-function renderPipeline(range){
-  const s = state.data.vsps || {};
-  const vsp = state.data.vsp || [];
-  const today = new Date(); today.setHours(0,0,0,0);
-  const trulyActive = vsp.filter(d => d.is_active &&
-    !['Terminated','Closed','Sold'].includes(d.acquisition_status||''));
-
-  // ======= Active Pipeline cards =======
-  document.getElementById('pl-cards').innerHTML = [
-    card('Active Deals', fmtN(s.active_deals), `${fmtN(s.in_uc)} UC · ${fmtN(s.in_dd)} DD`),
-    card('Site Works', fmtN(s.in_site_works), 'in DD prep work'),
-    card('At Closing', fmtN(s.at_closing), 'with title / closing'),
-    card('With End Buyer', fmtN(s.deals_with_buyer), `${fmtN(s.deals_listed)} listed`)
+function renderCostCards(m) {
+  const cards = [
+    statCard({
+      label: 'Cost per Lead',
+      value: fmt.money2(m.cost_per_lead),
+      sub: `Period spend ${fmt.moneyK(m.costs.marketing_total)} ÷ ${fmt.num(m.funnel.leads_total)} leads`,
+      pill: pillForMetric('cost_per_lead', m.cost_per_lead),
+      clickable: true,
+      onclick: `drillDown({segment:'leads',label:'All Leads'})`
+    }),
+    statCard({
+      label: 'Cost per Qualified',
+      value: fmt.money(m.cost_per_qualified),
+      sub: `${fmt.num(m.funnel.qualified_total)} qualified`,
+      pill: pillForMetric('cost_per_qualified', m.cost_per_qualified),
+      clickable: true,
+      onclick: `drillDown({segment:'qualified',label:'Qualified Leads'})`
+    }),
+    statCard({
+      label: 'Cost per Offer',
+      value: fmt.money(m.cost_per_offer),
+      sub: `${fmt.num(m.funnel.offers_made)} offers`,
+      clickable: true,
+      onclick: `drillDown({segment:'offers',label:'Offers Made'})`
+    }),
+    statCard({
+      label: 'Cost per UC',
+      value: fmt.money(m.cost_per_uc),
+      sub: `${fmt.num(m.funnel.uc_new)} UCs · all costs`,
+      clickable: true,
+      onclick: `drillDown({segment:'uc',label:'Under Contract'})`
+    }),
+    statCard({
+      label: 'Closed Net Profit',
+      value: fmt.money(m.closed.closed_net),
+      sub: `${fmt.num(m.closed.closed_deals)} deals · ${fmt.moneyK(m.closed.closed_revenue)} revenue`,
+      clickable: true,
+      onclick: `drillDown({segment:'closed',label:'Closed Deals'})`
+    }),
+    statCard({
+      label: 'ROAS',
+      value: m.roas != null ? (+m.roas).toFixed(2) + 'x' : '—',
+      sub: `${fmt.moneyK(m.closed.closed_net)} ÷ ${fmt.moneyK(m.costs.all_total)} all costs`,
+      pill: pillForMetric('roas_blended', m.roas)
+    })
   ].join('');
+  $('#cost-cards').innerHTML = cards;
+}
 
-  // ======= Capital & Risk =======
-  document.getElementById('pl-capital').innerHTML = [
-    card('Pipeline Cost Basis', fmt$(s.total_purchase_price), 'sum of purchase prices'),
-    card('PA Cash at Risk', fmt$(s.total_pa_cash_at_risk), 'out-of-pocket'),
-    card('Loan Balance', fmt$(s.total_loan_balance), `${fmt$(s.total_jv_contributions)} JV`),
-    card('EMD at Risk', fmt$(s.total_emd_at_risk), 'deposited only')
-  ].join('');
+function renderChannelCards(m) {
+  const channels = [
+    {
+      name: 'Cold Call', leads: m.funnel.leads_cold_call, qualified: m.funnel.qualified_cold_call,
+      cpl: m.cpl_cold_call, cpq: m.cpq_cold_call, cost: m.costs.cold_call, segChannel: 'Cold Call'
+    },
+    {
+      name: 'SMS', leads: m.funnel.leads_sms, qualified: m.funnel.qualified_sms,
+      cpl: m.cpl_sms, cpq: m.cpq_sms, cost: m.costs.sms, segChannel: 'SMS'
+    },
+    {
+      name: 'Direct Mail', leads: m.funnel.leads_direct_mail, qualified: m.funnel.qualified_direct_mail,
+      cpl: m.cpl_dm, cpq: null, cost: m.costs.direct_mail, segChannel: 'Direct Mail'
+    },
+    {
+      name: 'Inbound', leads: m.funnel.leads_inbound, qualified: m.funnel.qualified_inbound,
+      cpl: null, cpq: null, cost: 0, segChannel: 'Inbound'
+    }
+  ];
 
-  // ======= Profit Outlook =======
-  document.getElementById('pl-profit').innerHTML = [
-    card('Quick Profit Est', fmt$(s.total_quick_profit_estimate), 'pre-listing rough est', '', true),
-    card('Projected Profit', fmt$(s.total_projected_profit), 'listing × .9 − 1.06 × purchase', '', true),
-    card('Estimated PA Net', fmt$(s.total_estimated_pa_net), 'after JV split', '', true),
-    card('Avg ROI · IRR', `${fmtPctRaw(s.avg_roi_pct)} · ${fmtPctRaw(s.avg_irr_pct)}`, 'on PA capital'),
-    card('Days Held (avg)', fmt1(s.avg_days_held), 'acq → end buyer'),
-    card('Days UC (avg)', fmt1(s.avg_days_under_contract), 'still under contract'),
-    card('Days on Market (avg)', fmt1(s.avg_days_on_market), 'listed deals'),
-    card('Confirmed Sale Total', fmt$(s.total_confirmed_revenue), 'end buyer signed')
-  ].join('');
+  $('#channel-cards').innerHTML = channels.map(c => `<div class="card card-clickable" onclick="drillDown({segment:'leads',channel:'${c.segChannel}',label:'${c.name} Leads'})">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+      <div style="font-weight:600;font-size:0.9rem;">${c.name}</div>
+      <span class="pill pill-neutral">${fmt.moneyK(c.cost)}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+      <div>
+        <div class="label">Leads</div>
+        <div class="num" style="font-size:1.1rem;font-weight:600;">${fmt.num(c.leads)}</div>
+      </div>
+      <div>
+        <div class="label">Qualified</div>
+        <div class="num" style="font-size:1.1rem;font-weight:600;">${fmt.num(c.qualified)}</div>
+      </div>
+      <div>
+        <div class="label">CPL</div>
+        <div class="num" style="font-size:1rem;color:${c.cpl != null ? 'var(--text)' : 'var(--text-dim)'};">${c.cpl != null ? fmt.money2(c.cpl) : '—'}</div>
+      </div>
+      <div>
+        <div class="label">CPQ</div>
+        <div class="num" style="font-size:1rem;color:${c.cpq != null ? 'var(--text)' : 'var(--text-dim)'};">${c.cpq != null ? fmt.money(c.cpq) : '—'}</div>
+      </div>
+    </div>
+  </div>`).join('');
+}
 
-  // ======= Closing Timeline =======
-  const within = (d, days) => d.end_buyer_close_date && new Date(d.end_buyer_close_date)>=today && new Date(d.end_buyer_close_date)<=addDays(today,days);
-  const sumProj = arr => arr.reduce((sum,d)=>sum+(+d.actual_profit||+d.confirmed_profit||+d.projected_profit||+d.quick_profit_estimate||0), 0);
-  const w30 = trulyActive.filter(d=>within(d,30));
-  const w60 = trulyActive.filter(d=>within(d,60));
-  const w90 = trulyActive.filter(d=>within(d,90));
-  const noDate = trulyActive.filter(d=>!d.end_buyer_close_date);
-  document.getElementById('pj-cards').innerHTML = [
-    card('Closing in 30 Days', fmt$(sumProj(w30)), `${w30.length} deals`),
-    card('Closing in 60 Days', fmt$(sumProj(w60)), `${w60.length} deals`),
-    card('Closing in 90 Days', fmt$(sumProj(w90)), `${w90.length} deals`),
-    card('No Close Date Set', fmtN(noDate.length), 'needs attention')
-  ].join('');
+// ═══════════════════════════════════════════════════════════════
+// TAB: PIPELINE & PROFIT
+// ═══════════════════════════════════════════════════════════════
+async function renderPipelineTab() {
+  const [summary, active, stale, closed] = await Promise.all([
+    getPipelineSummary(),
+    getPipelineActive(),
+    getStaleDeals(),
+    getClosedDealsInPeriod()
+  ]);
 
-  // ======= Strategy Mix =======
-  document.getElementById('strategy-mix').innerHTML = [
-    card('Straight Purchase', fmtN(s.straight_purchase_deals), 'hold & resell retail'),
-    card('Double Close', fmtN(s.double_close_deals), 'back-to-back same-day'),
-    card('Assignment', fmtN(s.assignment_deals), 'never take title'),
-    card('Subdivide', fmtN(s.subdivide_deals), 'split into lots')
-  ].join('');
-
-  // ======= Subdivide Tracker =======
-  const subdivides = vsp.filter(d => d.closing_type === 'Subdivide Purchase' && d.is_active);
-  if(subdivides.length === 0){
-    document.getElementById('subdivide-card').innerHTML = `<div class="card text-sm text-gray-500">No active subdivide deals.</div>`;
-  } else {
-    const totalLots = s.total_subdivide_lots || 0;
-    const lotsSold = s.total_subdivide_lots_sold || 0;
-    const subdivRev = s.total_subdivide_revenue || 0;
-    const sellThru = totalLots ? (lotsSold/totalLots*100) : 0;
-    document.getElementById('subdivide-card').innerHTML = `
-      <div class="card">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-          ${card('Active Subdivide Deals', fmtN(subdivides.length))}
-          ${card('Total Lots', fmtN(totalLots), `${fmtN(lotsSold)} sold (${fmtPct(sellThru)})`)}
-          ${card('Lots Remaining', fmtN(totalLots-lotsSold))}
-          ${card('Revenue to Date', fmt$(subdivRev), 'closed lots')}
-        </div>
-        <table class="dt"><thead><tr>
-          <th>Deal</th><th>Status</th><th class="num">Total Lots</th><th class="num">Sold</th>
-          <th class="num">Revenue</th><th class="num">Avg/Lot</th><th class="num">Quick Est</th><th class="num">Days Held</th>
-        </tr></thead><tbody>
-        ${subdivides.map(d=>{
-          const lots = d.subdivide_total_lots || 0;
-          const sold = d.subdivide_lots_sold || 0;
-          const rev = d.subdivide_total_revenue || 0;
-          const avgLot = sold ? rev/sold : null;
-          return `<tr>
-            <td><b>${d.deal_name||'—'}</b></td>
-            <td>${d.acquisition_status||'—'}</td>
-            <td class="num">${fmtN(lots)}</td>
-            <td class="num">${fmtN(sold)}</td>
-            <td class="num">${fmt$(rev)}</td>
-            <td class="num">${fmt$(avgLot)}</td>
-            <td class="num">${fmt$(d.quick_profit_estimate)}</td>
-            <td class="num">${fmtN(d.days_held)}</td>
-          </tr>`;
-        }).join('')}
-        </tbody></table>
-      </div>`;
+  // Overview cards
+  if (summary) {
+    $('#pipeline-overview').innerHTML = [
+      statCard({ label: 'Active Deals', value: fmt.num(summary.active_deals), sub: `UC ${summary.in_uc} · DD ${summary.in_dd} · Site Works ${summary.in_site_works}` }),
+      statCard({ label: 'Total Purchase Price', value: fmt.moneyK(summary.total_purchase_price), sub: `${fmt.moneyK(summary.total_cash_to_close)} cash to close` }),
+      statCard({ label: 'PA Cash at Risk', value: fmt.moneyK(summary.total_pa_cash_at_risk), sub: `${fmt.moneyK(summary.total_emd_at_risk)} EMD · ${fmt.moneyK(summary.total_loan_balance)} loans` }),
+      statCard({ label: 'Quick Profit Est', value: fmt.moneyK(summary.total_quick_profit_estimate), sub: `<span class="info-tip" data-tip="Pre-listing rough estimate. Retail value − purchase − ~6% costs. Available on every deal from UC.">i</span>` }),
+      statCard({ label: 'Projected Profit', value: fmt.moneyK(summary.total_projected_profit), sub: `<span class="info-tip" data-tip="(Listing × 0.90) − (Purchase × 1.06). Only computed when listing_price exists.">i</span>` }),
+      statCard({ label: 'Estimated PA Net', value: fmt.moneyK(summary.total_estimated_pa_net), sub: `<span class="info-tip" data-tip="Projected Profit minus JV split minus dispo commission. What hits PA bank.">i</span>` }),
+      statCard({ label: 'Avg Days Held', value: fmt.num1(summary.avg_days_held), sub: `${fmt.num1(summary.avg_days_under_contract)} avg in UC` }),
+      statCard({ label: 'Avg ROI %', value: fmt.pct(summary.avg_roi_pct), sub: `${fmt.pct(summary.avg_irr_pct)} IRR` })
+    ].join('');
   }
 
-  // ======= UC stages health =======
-  const ph = (state.data.pipelineHealth || []).filter(s=>s.pipeline_name==='Under Contract');
-  document.getElementById('uc-stages').innerHTML = `<table class="dt"><thead><tr>
-    <th>Stage</th><th class="num">Deals</th><th class="num">Avg Days in Stage</th><th class="num">Stale (&gt;14d)</th><th class="num">Total Value</th>
-  </tr></thead><tbody>${ph.map(s=>`<tr>
-    <td><b>${s.stage_name}</b></td><td class="num">${fmtN(s.deals)}</td>
-    <td class="num">${fmt1(s.avg_days_in_stage)}</td><td class="num">${fmtN(s.stale_deals)}</td>
-    <td class="num">${fmt$(s.total_value)}</td></tr>`).join('')}</tbody></table>`;
+  // Stages table
+  const stageRows = active.map(s => `<tr>
+    <td>${s.pipeline_name}</td>
+    <td>${s.stage_name}</td>
+    <td class="num">${fmt.num(s.deals)}</td>
+    <td class="num">${fmt.num1(s.avg_days_in_stage)}d</td>
+    <td class="num">${s.stale_deals > 0 ? `<span class="pill pill-amber">${s.stale_deals}</span>` : '—'}</td>
+    <td class="num">${fmt.moneyK(s.total_value)}</td>
+  </tr>`).join('');
+  $('#pipeline-stages-table').innerHTML = `<table class="data-table">
+    <thead><tr><th>Pipeline</th><th>Stage</th><th>Deals</th><th>Avg Days</th><th>Stale</th><th>Value</th></tr></thead>
+    <tbody>${stageRows || '<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;">No active stages</td></tr>'}</tbody>
+  </table>`;
 
-  // ======= Active Deals table — now from v_sales_pipeline (richer) =======
-  document.getElementById('active-deals').innerHTML = `<table class="dt"><thead><tr>
-    <th>Deal</th><th>Status</th><th>Strategy</th><th>Source</th><th>State</th>
-    <th class="num">Acres</th><th class="num">Days UC</th><th class="num">Purchase</th>
-    <th class="num">Quick Est</th><th class="num">Projected</th><th class="num">PA Net</th>
-    <th class="num">ROI</th><th class="num">IRR</th>
-  </tr></thead><tbody>${trulyActive.slice(0,40).map(d=>`<tr>
-    <td><b>${d.deal_name||'—'}</b></td>
-    <td>${d.acquisition_status||'—'}</td>
-    <td>${d.closing_type ? `<span class="${strategyClass(d.closing_type)}">${d.closing_type}</span>` : '—'}</td>
-    <td>${d.lead_source||'—'}</td>
-    <td>${d.state||'—'}</td>
-    <td class="num">${fmt1(d.acreage)}</td>
-    <td class="num">${fmtN(d.days_under_contract)}</td>
-    <td class="num">${fmt$(d.purchase_price)}</td>
-    <td class="num">${fmt$(d.quick_profit_estimate)}</td>
-    <td class="num">${fmt$(d.projected_profit)}</td>
-    <td class="num">${fmt$(d.estimated_pa_net)}</td>
-    <td class="num">${d.deal_roi_pct!=null?fmtPctRaw(d.deal_roi_pct*100):'—'}</td>
-    <td class="num">${d.deal_irr_pct!=null?fmtPctRaw(d.deal_irr_pct*100):'—'}</td>
-  </tr>`).join('')}</tbody></table>`;
+  // Stale deals
+  const staleRows = stale.slice(0, 30).map(s => `<tr>
+    <td><a href="${CONFIG.PIPEDRIVE_BASE}/deal/${s.pipedrive_deal_id}" target="_blank">${s.title || '(untitled)'}</a></td>
+    <td>${s.stage_name}</td>
+    <td>${s.owner_name || '—'}</td>
+    <td class="num"><span class="pill pill-${s.days_since_update > 30 ? 'red' : s.days_since_update > 14 ? 'amber' : 'neutral'}">${s.days_since_update}d</span></td>
+    <td class="num">${fmt.moneyK(s.value)}</td>
+    <td class="num" style="color:var(--text-muted);font-size:0.75rem;">${fmt.dateLong(s.update_time)}</td>
+  </tr>`).join('');
+  $('#stale-deals-table').innerHTML = `<table class="data-table">
+    <thead><tr><th>Deal</th><th>Stage</th><th>Owner</th><th>Days Stale</th><th>Value</th><th>Last Update</th></tr></thead>
+    <tbody>${staleRows || '<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;">No stale deals 🎉</td></tr>'}</tbody>
+  </table>`;
 
-  // ======= Stale =======
-  const stale = state.data.stale || [];
-  document.getElementById('stale-deals').innerHTML = `<table class="dt"><thead><tr>
-    <th>Deal</th><th>Pipeline</th><th>Stage</th><th>Owner</th><th class="num">Days Since Update</th><th class="num">Days in Stage</th><th>Source</th>
-  </tr></thead><tbody>${stale.map(s=>`<tr>
-    <td><b>${s.title||'—'}</b></td><td>${s.pipeline_name||'—'}</td><td>${s.stage_name||'—'}</td>
-    <td>${s.owner_name||'—'}</td><td class="num">${fmtN(s.days_since_update)}</td>
-    <td class="num">${fmtN(s.days_in_stage)}</td><td>${s.lead_source||'—'}</td></tr>`).join('')}</tbody></table>`;
+  // Closed deals
+  $('#closed-window').textContent = `${fmt.dateLong(STATE.periodStart)} → ${fmt.dateLong(STATE.periodEnd)} (${closed.length} deals)`;
+  const closedRows = closed.map(d => `<tr>
+    <td>${d.deal_name || '(unnamed)'}</td>
+    <td>${[d.county, d.state].filter(Boolean).join(', ') || '—'}</td>
+    <td class="num">${d.acreage || '—'}</td>
+    <td class="num">${fmt.money(d.purchase_price)}</td>
+    <td class="num">${fmt.money(d.actual_sale_price || d.target_sale_price)}</td>
+    <td class="num">${fmt.money(d.actual_profit || d.estimated_pa_net)}</td>
+    <td class="num">${fmt.num1(d.days_under_contract)}d</td>
+    <td class="num" style="color:var(--text-muted);font-size:0.75rem;">${fmt.dateLong(d.actual_close_date)}</td>
+  </tr>`).join('');
+  $('#closed-deals-table').innerHTML = `<table class="data-table">
+    <thead><tr><th>Deal</th><th>Location</th><th>Acres</th><th>Purchase</th><th>Sale</th><th>Net</th><th>UC Days</th><th>Close Date</th></tr></thead>
+    <tbody>${closedRows || '<tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:2rem;">No closes in this period</td></tr>'}</tbody>
+  </table>`;
 }
 
-function renderTeam(range){
-  const a = aggKpi(state.data.kpi, range);
-  const quo = state.data.quo || [];
-  const sumQuo = (user, days, key) => quo.filter(q=>q.user_name===user).slice(0, days).reduce((s,r)=>s+(+r[key]||0),0);
+// ═══════════════════════════════════════════════════════════════
+// TAB: TEAM PERFORMANCE
+// ═══════════════════════════════════════════════════════════════
+async function renderTeamTab() {
+  const [cc, manny, jonathan, jared, days] = await Promise.all([
+    getColdCallers(),
+    getMannyDaily(14),
+    getAgentDaily('Jonathan Hernandez', 14),
+    getAgentDaily('Jared', 14),
+    getDailyPulse(14)
+  ]);
 
-  document.getElementById('am-cards').innerHTML = [
-    card('Qualifications', fmtN(a.qualified_leads_all), 'period (Pipedrive)'),
-    card('Offers Made', fmtN(a.offers_made), 'period (Pipedrive)'),
-    card('Contracts Signed', fmtN(a.deals_under_contract), 'period (Pipedrive)'),
-    card('Calls (4w)', fmtN(sumQuo('Jonathan',4,'total_calls')), 'from Quo dialer')
-  ].join('');
+  // Cold callers
+  const ccCurrent = cc.filter(x => x.week_rank === 1);
+  if (ccCurrent.length > 0) {
+    $('#cc-window').textContent = `Week of ${fmt.dateLong(ccCurrent[0].week_start)} → ${fmt.dateLong(ccCurrent[0].week_end)} (Mon–Sat) · Next refresh Tue`;
+  }
+  $('#cc-cards').innerHTML = ccCurrent.map(c => {
+    const leadsDelta = fmt.delta(c.leads_delta_pct);
+    const cpqDelta = fmt.delta(c.cpl_delta_pct, { lowerIsBetter: true });
+    return `<div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+        <div style="font-weight:600;font-size:0.95rem;">${c.caller_name}</div>
+        <span class="pill pill-neutral">${fmt.hours(c.hours_worked)}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+        <div>
+          <div class="label">Calls</div>
+          <div class="num" style="font-size:1.1rem;font-weight:600;">${fmt.num(c.total_calls)}</div>
+        </div>
+        <div>
+          <div class="label">Leads</div>
+          <div class="num" style="font-size:1.1rem;font-weight:600;">${fmt.num(c.total_leads)} ${leadsDelta}</div>
+        </div>
+        <div>
+          <div class="label">Qualified</div>
+          <div class="num" style="font-size:1rem;">${fmt.num(c.qualified)} <span style="color:var(--text-dim);">(${fmt.pct(c.quality_pct, 0)})</span></div>
+        </div>
+        <div>
+          <div class="label">CPL</div>
+          <div class="num" style="font-size:1rem;">${fmt.money2(c.cost_per_lead)} ${cpqDelta}</div>
+        </div>
+      </div>
+      <div style="margin-top:0.6rem;padding-top:0.6rem;border-top:1px solid var(--border);font-size:0.7rem;color:var(--text-dim);">
+        Pay: <span class="num">${fmt.money(c.total_pay)}</span> · vs prior 4w avg
+      </div>
+    </div>`;
+  }).join('') || '<div class="err-banner" style="grid-column:1/-1;">No cold caller data this week — next refresh expected Tuesday after work week ends.</div>';
 
-  document.getElementById('dispo-cards').innerHTML = [
-    card('Calls (4w)', fmtN(sumQuo('Jared',4,'total_calls')), 'from Quo dialer'),
-    card('Talk Hours (4w)', fmt1(sumQuo('Jared',4,'talk_time_hours')), ''),
-    card('Texts Sent (4w)', fmtN(sumQuo('Jared',4,'texts_sent')), ''),
-    card('Active Days (4w)', fmtN(sumQuo('Jared',4,'days_active')), '')
-  ].join('');
+  // Manny
+  const mannyTotal = manny.reduce((a, x) => a + (+x.total_calls || 0), 0);
+  const mannyTalk = manny.reduce((a, x) => a + (+x.talk_minutes || 0), 0) / 60;
+  const mannyAns = manny.reduce((a, x) => a + (+x.answered_calls || 0), 0);
+  const mannyTexts = manny.reduce((a, x) => a + (+x.sms_sent || 0), 0);
 
-  // ===== Lead Manager Manny — TWO ROWS =====
-  // Row 1: Activity (JustCall / v_lead_manager_weekly)
-  const lm = state.data.lm || [];
-  const lm4 = lm.slice(0,4);
-  const lmSum = k => lm4.reduce((s,r)=>s+(+r[k]||0),0);
-  const lmAvg = k => { const v=lm4.map(r=>+r[k]).filter(x=>!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:null; };
-  document.getElementById('lm-activity').innerHTML = [
-    card('Calls (4w)', fmtN(lmSum('total_calls')), `${fmtN(lmSum('outbound_calls'))} outbound`),
-    card('Talk Hours (4w)', fmt1(lmSum('talk_hours')), ''),
-    card('Answer Rate', fmtPct(lmAvg('answer_rate')), 'avg'),
-    card('SMS Activity', fmtN(lmSum('sms_sent')+lmSum('sms_received')), 'sent + received')
-  ].join('');
+  let mannyHtml = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;margin-bottom:1rem;">
+    ${statCard({ label: 'Calls (14d)', value: fmt.num(mannyTotal), sub: `${fmt.num1(mannyTotal/14)}/day avg` })}
+    ${statCard({ label: 'Talk Hours', value: fmt.hours(mannyTalk), sub: `${fmt.num1(mannyTalk/14)}h/day avg` })}
+    ${statCard({ label: 'Answered', value: fmt.num(mannyAns), sub: `${fmt.pct(mannyTotal ? mannyAns/mannyTotal*100 : 0)} answer rate` })}
+    ${statCard({ label: 'SMS Sent', value: fmt.num(mannyTexts), sub: `${fmt.num1(mannyTexts/14)}/day avg` })}
+  </div>`;
+  // Daily table
+  const mRows = manny.map(d => `<tr>
+    <td>${fmt.dateLong(d.date)}</td>
+    <td style="color:var(--text-muted);">${fmt.dayName(d.date)}</td>
+    <td class="num">${fmt.num(d.total_calls)}</td>
+    <td class="num">${fmt.num(d.outbound_calls)}</td>
+    <td class="num">${fmt.num(d.answered_calls)}</td>
+    <td class="num">${fmt.num1(d.talk_minutes/60)}h</td>
+    <td class="num">${fmt.num(d.sms_sent)}</td>
+    <td class="num">${fmt.pct(d.answer_rate, 0)}</td>
+  </tr>`).join('');
+  mannyHtml += `<div class="card" style="padding:0;"><div style="overflow-x:auto;"><table class="data-table">
+    <thead><tr><th>Date</th><th>Day</th><th>Total</th><th>Out</th><th>Ans</th><th>Talk</th><th>SMS</th><th>Ans%</th></tr></thead>
+    <tbody>${mRows || '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text-dim);">No data</td></tr>'}</tbody>
+  </table></div></div>`;
+  $('#manny-section').innerHTML = mannyHtml;
 
-  // Row 2: Outcomes (Pipedrive stage history via v_lead_manager_outcomes_weekly)
-  const lmOut = (state.data.lmOut || []).filter(r=>r.user_name==='Manny').slice(0,4);
-  const oSum = k => lmOut.reduce((s,r)=>s+(+r[k]||0),0);
-  const dealsTouched = oSum('deals_touched');
-  const quals = oSum('qualifications_generated');
-  const disq = oSum('disqualifications');
-  const qRate = (quals + disq) ? (quals / (quals + disq) * 100) : null;
-  document.getElementById('lm-outcomes').innerHTML = [
-    card('Deals Touched (4w)', fmtN(dealsTouched), `${fmtN(oSum('movements'))} stage moves`),
-    card('Qualifications (4w)', fmtN(quals), 'sent to AM pipeline'),
-    card('Disqualifications (4w)', fmtN(disq), 'leads dropped'),
-    card('Q-Rate', fmtPct(qRate), 'qualified / decided')
-  ].join('');
+  // Jonathan & Jared
+  $('#aj-section').innerHTML = [agentBlock('Jonathan', jonathan), agentBlock('Jared', jared)].join('');
 
-  // ===== SMS - Tamar =====
-  const sms = state.data.sms || [];
-  const sms4 = sms.slice(0,4);
-  const smsSum = k => sms4.reduce((s,r)=>s+(+r[k]||0),0);
-  const smsAvg = k => { const v=sms4.map(r=>+r[k]).filter(x=>!isNaN(x)); return v.length?v.reduce((a,b)=>a+b,0)/v.length:null; };
-  const totalTexts = smsSum('total_texts_sent');
-  const totalLeads = smsSum('total_leads_to_crm');
-  document.getElementById('sms-cards').innerHTML = [
-    card('Texts Sent (4w)', fmtN(totalTexts), ''),
-    card('Leads to CRM (4w)', fmtN(totalLeads), totalTexts ? `${fmt1(totalLeads/totalTexts*1000)} per 1k texts` : ''),
-    card('Response Rate', fmtPct(smsAvg('avg_response_rate')), '4w avg'),
-    card('Deliverability', fmtPct(smsAvg('avg_deliverability_rate')), '4w avg')
-  ].join('');
+  // Tamar (texts) & Julia (mailers)
+  const tamarTotal = days.reduce((a, x) => a + (+x.sms_texts_sent || 0), 0);
+  const tamarLeads = days.reduce((a, x) => a + (+x.new_leads_sms || 0), 0);
+  const tamarConv = days.reduce((a, x) => a + (+x.sms_conversations || 0), 0);
+  const dmLeads = days.reduce((a, x) => a + (+x.new_leads_direct_mail || 0), 0);
 
-  // ===== Cold caller team — last 4 weeks =====
-  const cc = state.data.cc || [];
-  const recentWeeks = cc.length ? Array.from(new Set(cc.map(c=>c.week_start))).slice(0,4) : [];
-  const ccRecent = cc.filter(c=>recentWeeks.includes(c.week_start));
-  const byCaller = {};
-  ccRecent.forEach(r=>{
-    const k=r.caller_name; if(!byCaller[k]) byCaller[k]={ leads:0,qual:0,calls:0,hours:0,pay:0 };
-    byCaller[k].leads += +r.total_leads||0;
-    byCaller[k].qual += +r.qualified||0;
-    byCaller[k].calls += +r.total_calls||0;
-    byCaller[k].hours += +r.hours_worked||0;
-    byCaller[k].pay += +r.total_pay||0;
-  });
-  const callers = Object.entries(byCaller).map(([n,d])=>({n,...d, cpl:d.leads?d.pay/d.leads:null, cpq:d.qual?d.pay/d.qual:null}))
-    .sort((a,b)=>b.leads-a.leads);
-  document.getElementById('cc-table').innerHTML = `<table class="dt"><thead><tr>
-    <th>Caller</th><th class="num">Leads</th><th class="num">Qualified</th><th class="num">Q Rate</th><th class="num">Calls</th><th class="num">Hours</th><th class="num">Pay</th><th class="num">CPL</th><th class="num">CPQ</th>
-  </tr></thead><tbody>${callers.map(c=>`<tr>
-    <td><b>${c.n}</b></td><td class="num">${fmtN(c.leads)}</td><td class="num">${fmtN(c.qual)}</td>
-    <td class="num">${c.leads?fmtPct(c.qual/c.leads*100):'—'}</td><td class="num">${fmtN(c.calls)}</td>
-    <td class="num">${fmt1(c.hours)}</td><td class="num">${fmt$0(c.pay)}</td>
-    <td class="num">${fmt$0(c.cpl)}</td><td class="num">${fmt$0(c.cpq)}</td></tr>`).join('')}</tbody></table>`;
+  $('#tj-section').innerHTML = `
+    <div class="card">
+      <div style="font-weight:600;font-size:0.95rem;margin-bottom:0.6rem;">Tamar — SMS</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+        <div><div class="label">Texts Sent (14d)</div><div class="num" style="font-size:1.1rem;font-weight:600;">${fmt.num(tamarTotal)}</div></div>
+        <div><div class="label">Avg/Day</div><div class="num" style="font-size:1.1rem;font-weight:600;">${fmt.num(tamarTotal/14)}</div></div>
+        <div><div class="label">Leads to CRM</div><div class="num" style="font-size:1rem;">${fmt.num(tamarLeads)}</div></div>
+        <div><div class="label">Conversations</div><div class="num" style="font-size:1rem;">${fmt.num(tamarConv)}</div></div>
+        <div><div class="label">Lead Rate</div><div class="num" style="font-size:1rem;">${fmt.num1(tamarTotal ? tamarLeads/tamarTotal*1000 : 0)} / 1k</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-weight:600;font-size:0.95rem;margin-bottom:0.6rem;">Julia — Direct Mail</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+        <div><div class="label">DM Leads (14d)</div><div class="num" style="font-size:1.1rem;font-weight:600;">${fmt.num(dmLeads)}</div></div>
+        <div><div class="label">Avg/Day</div><div class="num" style="font-size:1.1rem;font-weight:600;">${fmt.num1(dmLeads/14)}</div></div>
+      </div>
+      <div style="margin-top:0.75rem;color:var(--text-dim);font-size:0.75rem;line-height:1.5;">Julia's mailer-send volume isn't tracked in Supabase yet. Adding mailers_sent_daily to the schema would give CPL by mailer.</div>
+    </div>`;
 }
 
-function renderCosts(range){
-  const a = aggKpi(state.data.kpi, range);
-  const costs = state.data.costs || [];
-  const latest = costs[0] || {};
-  document.getElementById('costs-cards').innerHTML = [
-    card('Monthly Burn', fmt$(latest.total_monthly_burn), latest.month?fmtD(latest.month):''),
-    card('Cold Call Total', fmt$(latest.cold_call_total), 'fixed + wages'),
-    card('SMS Total', fmt$(latest.sms_total)),
-    card('Overhead', fmt$(latest.overhead_total))
-  ].join('');
-
-  chart('c-burn','bar',{
-    labels: costs.slice(0,12).reverse().map(c=>fmtD(c.month)),
-    datasets: [
-      { label:'Cold Call', data:costs.slice(0,12).reverse().map(c=>+c.cold_call_total||0), backgroundColor:'#3b82f6' },
-      { label:'SMS', data:costs.slice(0,12).reverse().map(c=>+c.sms_total||0), backgroundColor:'#8b5cf6' },
-      { label:'Acquisition', data:costs.slice(0,12).reverse().map(c=>+c.acquisition_total||0), backgroundColor:'#f59e0b' },
-      { label:'Overhead', data:costs.slice(0,12).reverse().map(c=>+c.overhead_total||0), backgroundColor:'#6b7280' }
-    ]
-  },{ scales:{ x:{ stacked:true, grid:{display:false}, ticks:{font:{size:10}}}, y:{ stacked:true, grid:{color:'#f3f4f6'}, ticks:{font:{size:10}}}}});
-
-  const k = state.data.kpi || [];
-  chart('c-roas','line',{
-    labels: k.map(w=>fmtD(w.week_start)),
-    datasets: [
-      { label:'Cold Call', data:k.map(w=>+w.roas_cc_t3m||null), borderColor:'#3b82f6', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'SMS', data:k.map(w=>+w.roas_sms_t3m||null), borderColor:'#8b5cf6', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'Direct Mail', data:k.map(w=>+w.roas_dm_t3m||null), borderColor:'#f59e0b', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'All', data:k.map(w=>+w.roas_all_t3m||null), borderColor:'#111827', backgroundColor:'transparent', tension:.3, pointRadius:2, borderDash:[5,3] }
-    ]
-  });
-
-  document.getElementById('cpx-table').innerHTML = `<table class="dt"><thead><tr>
-    <th>Metric</th><th class="num">All</th><th class="num">Cold Call</th><th class="num">SMS</th><th class="num">Direct Mail</th>
-  </tr></thead><tbody>
-    <tr><td><b>Cost / Lead (T4W)</b></td><td class="num">${fmt$0(a.cost_per_lead_t4w)}</td>
-      <td class="num">${fmt$0(a.cost_per_lead_cc_t4w)}</td><td class="num">${fmt$0(a.cost_per_lead_sms_t4w)}</td>
-      <td class="num">${fmt$0(a.cost_per_lead_dm_t4w)}</td></tr>
-    <tr><td><b>Cost / Qualified (T4W)</b></td><td class="num">${fmt$0(a.cost_per_qualified_t4w)}</td>
-      <td class="num">${fmt$0(a.cost_per_qualified_cc_t4w)}</td><td class="num">${fmt$0(a.cost_per_qualified_sms_t4w)}</td>
-      <td class="num">${fmt$0(a.cost_per_qualified_dm_t4w)}</td></tr>
-    <tr><td><b>ROAS (T3M)</b></td><td class="num">${fmtX(a.roas_all_t3m)}</td>
-      <td class="num">${fmtX(a.roas_cc_t3m)}</td><td class="num">${fmtX(a.roas_sms_t3m)}</td><td class="num">${fmtX(a.roas_dm_t3m)}</td></tr>
-  </tbody></table>`;
+function agentBlock(name, data) {
+  if (!data || data.length === 0) return `<div class="card"><div style="font-weight:600;">${name}</div><div style="color:var(--text-dim);padding:1rem 0;">No data</div></div>`;
+  const total = data.reduce((a, x) => a + (+x.total_calls || 0), 0);
+  const talk = data.reduce((a, x) => a + (+x.talk_minutes || 0), 0) / 60;
+  const sms = data.reduce((a, x) => a + (+x.sms_sent || 0), 0);
+  const days = data.length;
+  return `<div class="card">
+    <div style="font-weight:600;font-size:0.95rem;margin-bottom:0.6rem;">${name}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+      <div><div class="label">Calls (${days}d)</div><div class="num" style="font-size:1.1rem;font-weight:600;">${fmt.num(total)}</div></div>
+      <div><div class="label">Talk</div><div class="num" style="font-size:1.1rem;font-weight:600;">${fmt.hours(talk)}</div></div>
+      <div><div class="label">SMS</div><div class="num">${fmt.num(sms)}</div></div>
+      <div><div class="label">Avg/Day</div><div class="num">${fmt.num1(total/days)} calls</div></div>
+    </div>
+  </div>`;
 }
 
-function renderTrends(){
-  const k = state.data.kpi || [];
-  const lbls = k.map(w=>fmtD(w.week_start));
+// ═══════════════════════════════════════════════════════════════
+// TAB: CUSTOM VIEW
+// ═══════════════════════════════════════════════════════════════
+const METRIC_LIBRARY = [
+  // Funnel
+  { key: 'funnel_leads_total',     label: 'Total Leads',          group: 'Funnel',     accessor: m => m.funnel.leads_total,         format: 'num' },
+  { key: 'funnel_qualified',       label: 'Qualified Leads',      group: 'Funnel',     accessor: m => m.funnel.qualified_total,    format: 'num' },
+  { key: 'funnel_offers',          label: 'Offers Made',          group: 'Funnel',     accessor: m => m.funnel.offers_made,        format: 'num' },
+  { key: 'funnel_uc',              label: 'New Under Contract',   group: 'Funnel',     accessor: m => m.funnel.uc_new,             format: 'num' },
+  { key: 'funnel_closed',          label: 'Closed Deals',         group: 'Funnel',     accessor: m => m.funnel.closed,             format: 'num' },
+  { key: 'funnel_terminated',      label: 'Terminated',           group: 'Funnel',     accessor: m => m.funnel.terminated,         format: 'num' },
+  { key: 'funnel_disqualified',    label: 'Disqualified',         group: 'Funnel',     accessor: m => m.funnel.disqualified,       format: 'num' },
+  // Conversion
+  { key: 'conv_lead_qual_pct',     label: 'Lead → Qualified %',   group: 'Conversion', accessor: m => m.funnel.lead_to_qual_pct,   format: 'pct' },
+  { key: 'conv_qual_offer_pct',    label: 'Qualified → Offer %',  group: 'Conversion', accessor: m => m.funnel.qual_to_offer_pct,  format: 'pct' },
+  { key: 'conv_offer_uc_pct',      label: 'Offer → UC %',         group: 'Conversion', accessor: m => m.funnel.offer_to_uc_pct,    format: 'pct' },
+  { key: 'conv_uc_close_pct',      label: 'UC → Close %',         group: 'Conversion', accessor: m => m.funnel.uc_to_close_pct,    format: 'pct' },
+  { key: 'conv_lead_uc_pct',       label: 'Lead → UC %',          group: 'Conversion', accessor: m => m.funnel.lead_to_uc_pct,     format: 'pct' },
+  // Costs
+  { key: 'cost_total',             label: 'Total Cost',           group: 'Costs',      accessor: m => m.costs.all_total,           format: 'money' },
+  { key: 'cost_marketing',         label: 'Marketing Cost',       group: 'Costs',      accessor: m => m.costs.marketing_total,     format: 'money' },
+  { key: 'cost_cold_call',         label: 'Cold Call Cost',       group: 'Costs',      accessor: m => m.costs.cold_call,           format: 'money' },
+  { key: 'cost_sms',               label: 'SMS Cost',             group: 'Costs',      accessor: m => m.costs.sms,                 format: 'money' },
+  { key: 'cost_dm',                label: 'Direct Mail Cost',     group: 'Costs',      accessor: m => m.costs.direct_mail,         format: 'money' },
+  { key: 'cost_overhead',          label: 'Overhead Cost',        group: 'Costs',      accessor: m => m.costs.overhead,            format: 'money' },
+  // Cost-per
+  { key: 'cpl',                    label: 'Cost per Lead',        group: 'Cost per',   accessor: m => m.cost_per_lead,             format: 'money2' },
+  { key: 'cpq',                    label: 'Cost per Qualified',   group: 'Cost per',   accessor: m => m.cost_per_qualified,        format: 'money' },
+  { key: 'cp_offer',               label: 'Cost per Offer',       group: 'Cost per',   accessor: m => m.cost_per_offer,            format: 'money' },
+  { key: 'cp_uc',                  label: 'Cost per UC',          group: 'Cost per',   accessor: m => m.cost_per_uc,               format: 'money' },
+  { key: 'cpl_cc',                 label: 'CPL — Cold Call',      group: 'Cost per',   accessor: m => m.cpl_cold_call,             format: 'money2' },
+  { key: 'cpq_cc',                 label: 'CPQ — Cold Call',      group: 'Cost per',   accessor: m => m.cpq_cold_call,             format: 'money' },
+  { key: 'cpl_sms',                label: 'CPL — SMS',            group: 'Cost per',   accessor: m => m.cpl_sms,                   format: 'money2' },
+  { key: 'cpq_sms',                label: 'CPQ — SMS',            group: 'Cost per',   accessor: m => m.cpq_sms,                   format: 'money' },
+  // Profit
+  { key: 'closed_revenue',         label: 'Closed Revenue',       group: 'Profit',     accessor: m => m.closed.closed_revenue,     format: 'money' },
+  { key: 'closed_net',             label: 'Closed Net Profit',    group: 'Profit',     accessor: m => m.closed.closed_net,         format: 'money' },
+  { key: 'roas',                   label: 'ROAS',                 group: 'Profit',     accessor: m => m.roas,                       format: 'mult' },
+  // Channel volume
+  { key: 'leads_cc',               label: 'Cold Call Leads',      group: 'By Channel', accessor: m => m.funnel.leads_cold_call,    format: 'num' },
+  { key: 'leads_sms_v',            label: 'SMS Leads',            group: 'By Channel', accessor: m => m.funnel.leads_sms,          format: 'num' },
+  { key: 'leads_dm',               label: 'Direct Mail Leads',    group: 'By Channel', accessor: m => m.funnel.leads_direct_mail,  format: 'num' },
+  { key: 'leads_inbound_v',        label: 'Inbound Leads',        group: 'By Channel', accessor: m => m.funnel.leads_inbound,      format: 'num' },
+  { key: 'qual_cc',                label: 'Cold Call Qualified',  group: 'By Channel', accessor: m => m.funnel.qualified_cold_call,format: 'num' },
+  { key: 'qual_sms',               label: 'SMS Qualified',        group: 'By Channel', accessor: m => m.funnel.qualified_sms,      format: 'num' }
+];
 
-  chart('c-tr-funnel','line',{
-    labels: lbls,
-    datasets: [
-      { label:'Leads', data:k.map(w=>+w.gross_leads_all||0), borderColor:'#3b82f6', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'Qualified', data:k.map(w=>+w.qualified_leads_all||0), borderColor:'#10b981', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'Offers', data:k.map(w=>+w.offers_made||0), borderColor:'#f59e0b', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'UC', data:k.map(w=>+w.deals_under_contract||0), borderColor:'#ef4444', backgroundColor:'transparent', tension:.3, pointRadius:2 }
-    ]
+const FORMATTERS = {
+  num: fmt.num, money: fmt.money, money2: fmt.money2, pct: fmt.pct,
+  mult: (v) => v == null ? '—' : (+v).toFixed(2) + 'x'
+};
+
+async function renderCustomTab() {
+  await getPeriodMetrics(); // ensure loaded
+  populatePresetSelector();
+  renderCustomGrid();
+}
+
+function renderCustomGrid() {
+  const m = STATE.data.metrics;
+  const grid = $('#custom-grid');
+  const empty = $('#custom-empty');
+
+  if (STATE.customMetrics.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = STATE.customMetrics.map(key => {
+    const def = METRIC_LIBRARY.find(x => x.key === key);
+    if (!def) return '';
+    const val = def.accessor(m);
+    const fmtFn = FORMATTERS[def.format] || fmt.num;
+    return `<div class="card" style="position:relative;">
+      <button onclick="removeCustomMetric('${key}')" style="position:absolute;top:8px;right:8px;background:transparent;border:1px solid var(--border);color:var(--text-dim);width:22px;height:22px;border-radius:4px;cursor:pointer;font-size:0.75rem;line-height:1;" title="Remove">×</button>
+      <div class="label">${def.label}</div>
+      <div class="stat-num" style="margin-top:0.5rem;">${fmtFn(val)}</div>
+      <div class="stat-sub" style="color:var(--text-dim);">${def.group}</div>
+    </div>`;
+  }).join('');
+}
+
+function addCustomMetric(key) {
+  if (!STATE.customMetrics.includes(key)) {
+    STATE.customMetrics.push(key);
+    renderCustomGrid();
+    closePicker();
+  }
+}
+
+function removeCustomMetric(key) {
+  STATE.customMetrics = STATE.customMetrics.filter(x => x !== key);
+  renderCustomGrid();
+}
+
+function clearCustom() {
+  STATE.customMetrics = [];
+  STATE.currentPresetId = null;
+  $('#preset-select').value = '';
+  renderCustomGrid();
+}
+
+function openPicker() {
+  $('#picker-overlay').classList.add('open');
+  $('#picker-search').value = '';
+  renderPickerList('');
+  $('#picker-search').focus();
+}
+
+function closePicker() {
+  $('#picker-overlay').classList.remove('open');
+}
+
+function renderPickerList(query) {
+  const q = query.toLowerCase().trim();
+  const grouped = {};
+  METRIC_LIBRARY
+    .filter(m => !STATE.customMetrics.includes(m.key))
+    .filter(m => !q || m.label.toLowerCase().includes(q) || m.group.toLowerCase().includes(q))
+    .forEach(m => {
+      if (!grouped[m.group]) grouped[m.group] = [];
+      grouped[m.group].push(m);
+    });
+
+  let html = '';
+  for (const [group, items] of Object.entries(grouped)) {
+    html += `<div style="padding:0.5rem 1.5rem;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-dim);font-weight:600;background:var(--bg);">${group}</div>`;
+    items.forEach(m => {
+      html += `<div class="picker-row" onclick="addCustomMetric('${m.key}')">
+        <div class="name">${m.label}</div>
+      </div>`;
+    });
+  }
+  $('#picker-list').innerHTML = html || '<div style="padding:2rem;text-align:center;color:var(--text-dim);">No metrics match.</div>';
+}
+
+function populatePresetSelector() {
+  const sel = $('#preset-select');
+  sel.innerHTML = '<option value="">— Choose preset —</option>' +
+    STATE.presets.map(p => `<option value="${p.id}" ${p.id === STATE.currentPresetId ? 'selected' : ''}>${p.name}</option>`).join('');
+}
+
+function loadPreset(id) {
+  const p = STATE.presets.find(x => x.id === id);
+  if (!p) return;
+  STATE.currentPresetId = id;
+  STATE.customMetrics = [...p.metrics];
+  renderCustomGrid();
+}
+
+function savePreset() {
+  const name = prompt('Preset name:');
+  if (!name) return;
+  const id = 'preset_' + Date.now();
+  STATE.presets.push({ id, name, metrics: [...STATE.customMetrics] });
+  STATE.currentPresetId = id;
+  localStorage.setItem('pa_dashboard_presets', JSON.stringify(STATE.presets));
+  populatePresetSelector();
+}
+
+function deletePreset() {
+  if (!STATE.currentPresetId) { alert('No preset selected.'); return; }
+  if (!confirm('Delete this preset?')) return;
+  STATE.presets = STATE.presets.filter(p => p.id !== STATE.currentPresetId);
+  STATE.currentPresetId = null;
+  localStorage.setItem('pa_dashboard_presets', JSON.stringify(STATE.presets));
+  populatePresetSelector();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TAB: TRENDS
+// ═══════════════════════════════════════════════════════════════
+async function renderTrendsTab() {
+  const [snapshots, monthlyCosts] = await Promise.all([
+    getKpiSnapshots(12),
+    getMonthlyCosts()
+  ]);
+
+  const chronological = [...snapshots].reverse();
+  const labels = chronological.map(s => fmt.dateLong(s.week_start));
+
+  const chartOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: '#8b8fa3', font: { family: 'IBM Plex Sans' } } },
+      tooltip: { backgroundColor: '#161823', borderColor: '#353a4d', borderWidth: 1, titleColor: '#e8e9ee', bodyColor: '#e8e9ee' }
+    },
+    scales: {
+      x: { ticks: { color: '#5a5e72', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: '#252836' } },
+      y: { ticks: { color: '#5a5e72', font: { family: 'JetBrains Mono', size: 10 } }, grid: { color: '#252836' }, beginAtZero: true }
+    }
+  };
+
+  // CPL/CPQ trend
+  destroyChart('chart-cpl-trend');
+  STATE.charts['cpl'] = new Chart($('#chart-cpl-trend'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'CPL (T4W)', data: chronological.map(s => +s.cost_per_lead_t4w || null), borderColor: '#6ea8ff', backgroundColor: 'rgba(110,168,255,0.1)', tension: 0.3, fill: true, spanGaps: true },
+        { label: 'CPQ (T4W)', data: chronological.map(s => +s.cost_per_qualified_t4w || null), borderColor: '#fbbf24', backgroundColor: 'rgba(251,191,36,0.1)', tension: 0.3, fill: false, spanGaps: true }
+      ]
+    },
+    options: chartOpts
   });
 
-  chart('c-tr-qual','line',{
-    labels: lbls,
-    datasets: [{ label:'Qualification Rate %', data:k.map(w=>+w.qualification_rate||null), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.1)', fill:true, tension:.3, pointRadius:2 }]
+  // Funnel volume
+  destroyChart('chart-funnel-trend');
+  STATE.charts['funnel'] = new Chart($('#chart-funnel-trend'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Leads', data: chronological.map(s => +s.gross_leads_all || 0), backgroundColor: 'rgba(110,168,255,0.6)' },
+        { label: 'Qualified', data: chronological.map(s => +s.qualified_leads_all || 0), backgroundColor: 'rgba(74,222,128,0.7)' },
+        { label: 'UC', data: chronological.map(s => +s.deals_under_contract || 0), backgroundColor: 'rgba(251,191,36,0.8)' }
+      ]
+    },
+    options: chartOpts
   });
 
-  chart('c-tr-cost','line',{
-    labels: lbls,
-    datasets: [
-      { label:'Cost/Lead', data:k.map(w=>+w.cost_per_lead_t4w||null), borderColor:'#3b82f6', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'Cost/Qualified', data:k.map(w=>+w.cost_per_qualified_t4w||null), borderColor:'#ef4444', backgroundColor:'transparent', tension:.3, pointRadius:2 }
-    ]
+  // Closed
+  destroyChart('chart-closed-trend');
+  STATE.charts['closed'] = new Chart($('#chart-closed-trend'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'APNs Sold', data: chronological.map(s => +s.apns_sold || 0), borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', tension: 0.3, fill: true, yAxisID: 'y' },
+        { label: 'Net Profit (T4W avg)', data: chronological.map(s => +s.net_profit_t4w_avg || null), borderColor: '#fbbf24', tension: 0.3, fill: false, yAxisID: 'y1', spanGaps: true }
+      ]
+    },
+    options: {
+      ...chartOpts,
+      scales: {
+        x: chartOpts.scales.x,
+        y: { ...chartOpts.scales.y, position: 'left', title: { display: true, text: 'Deals', color: '#5a5e72' } },
+        y1: { ...chartOpts.scales.y, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Net Profit ($)', color: '#5a5e72' } }
+      }
+    }
   });
 
-  const quo = state.data.quo || [];
-  const weeks = Array.from(new Set(quo.map(q=>q.week_start))).sort();
-  const jonCalls = weeks.map(ws=>{ const r=quo.find(q=>q.week_start===ws && q.user_name==='Jonathan'); return r?+r.total_calls||0:0; });
-  const jaredCalls = weeks.map(ws=>{ const r=quo.find(q=>q.week_start===ws && q.user_name==='Jared'); return r?+r.total_calls||0:0; });
-  chart('c-tr-calls','line',{
-    labels: weeks.map(w=>fmtD(w)),
-    datasets: [
-      { label:'Jonathan', data:jonCalls, borderColor:'#3b82f6', backgroundColor:'transparent', tension:.3, pointRadius:2 },
-      { label:'Jared', data:jaredCalls, borderColor:'#f59e0b', backgroundColor:'transparent', tension:.3, pointRadius:2 }
-    ]
+  // ROAS
+  destroyChart('chart-roas-trend');
+  STATE.charts['roas'] = new Chart($('#chart-roas-trend'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'ROAS All (T3M)', data: chronological.map(s => +s.roas_all_t3m || null), borderColor: '#6ea8ff', backgroundColor: 'rgba(110,168,255,0.15)', tension: 0.3, fill: true, spanGaps: true },
+        { label: 'ROAS Cold Call', data: chronological.map(s => +s.roas_cc_t3m || null), borderColor: '#4ade80', tension: 0.3, fill: false, spanGaps: true },
+        { label: 'ROAS SMS', data: chronological.map(s => +s.roas_sms_t3m || null), borderColor: '#fbbf24', tension: 0.3, fill: false, spanGaps: true }
+      ]
+    },
+    options: chartOpts
   });
 }
 
-// ---------- Tabs & filters ----------
-function showTab(t){
-  state.tab = t;
-  document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
-  document.querySelectorAll('[data-section]').forEach(s=>{ s.hidden = s.dataset.section!==t; });
-}
-function setFilter(f){
-  state.filter = f;
-  document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active', b.dataset.filter===f));
-  if(state.data.kpi) renderAll();
+function destroyChart(id) {
+  if (STATE.charts[id]) { STATE.charts[id].destroy(); delete STATE.charts[id]; }
+  // Map old IDs
+  Object.keys(STATE.charts).forEach(k => {
+    if (STATE.charts[k]?.canvas?.id === id) { STATE.charts[k].destroy(); delete STATE.charts[k]; }
+  });
 }
 
-// ---------- Init ----------
-document.addEventListener('DOMContentLoaded', ()=>{
-  document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
-  document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
-  document.getElementById('refresh-btn').addEventListener('click', loadAll);
-  document.getElementById('auto-refresh').addEventListener('change', e=>{
-    if(state.autoTimer){ clearInterval(state.autoTimer); state.autoTimer=null; }
-    if(e.target.checked) state.autoTimer = setInterval(loadAll, CONFIG.AUTO_REFRESH_MINUTES*60*1000);
+// ═══════════════════════════════════════════════════════════════
+// TAB DISPATCH
+// ═══════════════════════════════════════════════════════════════
+const TAB_RENDERERS = {
+  daily: renderDailyTab,
+  scorecard: renderScorecardTab,
+  leads: renderLeadsTab,
+  pipeline: renderPipelineTab,
+  team: renderTeamTab,
+  custom: renderCustomTab,
+  trends: renderTrendsTab
+};
+
+async function switchTab(name) {
+  STATE.activeTab = name;
+  $$('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  $$('.tab-pane').forEach(p => p.classList.toggle('active', p.id === `tab-${name}`));
+  await renderActiveTab();
+}
+
+async function renderActiveTab() {
+  $('#error-container').innerHTML = '';
+  try {
+    const fn = TAB_RENDERERS[STATE.activeTab];
+    if (fn) await fn();
+  } catch (e) {
+    console.error(e);
+    $('#error-container').innerHTML = `<div class="err-banner">Error rendering: ${e.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PERIOD MGMT
+// ═══════════════════════════════════════════════════════════════
+async function setPeriod(name, custom = null) {
+  STATE.period = name;
+  const r = periodRange(name, custom);
+  STATE.periodStart = r.start;
+  STATE.periodEnd = r.end;
+  STATE.customRange = custom;
+  STATE.data = {}; // invalidate
+
+  $('#period-display').textContent = `${fmt.dateLong(r.start)} → ${fmt.dateLong(r.end)} (${daysBetween(r.start, r.end)}d)`;
+  $$('.period-btn[data-period]').forEach(b => b.classList.toggle('active', b.dataset.period === name));
+  $('#custom-range').style.display = name === 'custom' ? 'flex' : 'none';
+  await renderActiveTab();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UI WIRING
+// ═══════════════════════════════════════════════════════════════
+function wireUI() {
+  // Period buttons
+  $$('.period-btn[data-period]').forEach(b => {
+    b.addEventListener('click', () => {
+      if (b.dataset.period === 'custom') {
+        $('#custom-range').style.display = 'flex';
+        $$('.period-btn[data-period]').forEach(x => x.classList.toggle('active', x === b));
+        return;
+      }
+      setPeriod(b.dataset.period);
+    });
   });
-  state.autoTimer = setInterval(loadAll, CONFIG.AUTO_REFRESH_MINUTES*60*1000);
-  loadAll();
-});
+  $('#custom-apply').addEventListener('click', () => {
+    const start = $('#custom-start').value;
+    const end = $('#custom-end').value;
+    if (!start || !end) { alert('Pick both dates.'); return; }
+    if (start > end) { alert('Start must be before end.'); return; }
+    setPeriod('custom', { start, end });
+  });
+
+  // Tabs
+  $$('.tab-btn').forEach(b => {
+    b.addEventListener('click', () => switchTab(b.dataset.tab));
+  });
+
+  // Refresh
+  $('#refresh-btn').addEventListener('click', async () => {
+    STATE.data = {};
+    STATE.targets = await sb('/v_kpi_targets_active?select=*').catch(() => []);
+    await renderActiveTab();
+    $('#last-updated').textContent = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  });
+
+  // Drill panel
+  $('#drill-close').addEventListener('click', closeDrill);
+  $('#drill-overlay').addEventListener('click', closeDrill);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if ($('#drill-panel').classList.contains('open')) closeDrill();
+      if ($('#picker-overlay').classList.contains('open')) closePicker();
+    }
+  });
+
+  // Custom view
+  $('#picker-open').addEventListener('click', openPicker);
+  $('#picker-close').addEventListener('click', closePicker);
+  $('#picker-overlay').addEventListener('click', e => { if (e.target.id === 'picker-overlay') closePicker(); });
+  $('#picker-search').addEventListener('input', e => renderPickerList(e.target.value));
+  $('#preset-select').addEventListener('change', e => loadPreset(e.target.value));
+  $('#preset-save').addEventListener('click', savePreset);
+  $('#preset-delete').addEventListener('click', deletePreset);
+  $('#custom-clear').addEventListener('click', clearCustom);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+async function init() {
+  try {
+    STATE.targets = await sb('/v_kpi_targets_active?select=*');
+  } catch (e) {
+    console.warn('Failed to load targets:', e);
+    STATE.targets = [];
+  }
+
+  try {
+    STATE.presets = JSON.parse(localStorage.getItem('pa_dashboard_presets') || '[]');
+  } catch (e) {
+    STATE.presets = [];
+  }
+
+  wireUI();
+
+  await setPeriod('this_week');
+
+  $('#last-updated').textContent = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  setTimeout(() => $('#app-loading').classList.add('hidden'), 100);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
 </script>
 </body>
 </html>
